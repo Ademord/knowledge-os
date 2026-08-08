@@ -1,0 +1,6 @@
+{
+  "graphs": [
+    { "id": "german-a2", "file": "graph.json", "label": "German · A2", "sub": "Language pack · lexical graph" },
+    { "id": "llm-engineering", "file": "graph-llm.json", "label": "LLM Engineering", "sub": "CS pack · dependency graph" }
+  ]
+}
