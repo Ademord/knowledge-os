@@ -8,6 +8,10 @@ KnowledgeOS does not replace Claude/GPT/Gemini. It is **everything around the tu
 
 **The loop:** `Knowledge Graph → Curriculum Artifact (conceptual order) → Session Planner → Plan Artifact (dated sessions) → 📋 Copy Session Prompt (persona + behavior contract + tonight's arc + your notes) → your LLM (the session) → paste back → Conversation Analyzer → mastery · misconceptions · Learning Profile → the plan advances`.
 
+## Try it
+
+**Live demo:** [ademord.github.io/knowledge-os/KnowledgeOS.dc.html](https://ademord.github.io/knowledge-os/KnowledgeOS.dc.html) — your plan and progress stay in your browser.
+
 ## Quickstart
 
 ```bash
