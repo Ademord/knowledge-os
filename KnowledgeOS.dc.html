@@ -756,6 +756,58 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
         </sc-for>
         <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:#3A4266;margin-top:24px">{{ jFooter }}</div>
       </div>
+      <div onClick="{{ npOpenGo }}" title="New learning path — tell it what you want to learn" style="position:fixed;right:22px;bottom:22px;z-index:46;width:46px;height:46px;border-radius:50%;background:#F0B454;color:#171126;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.45)" style-hover="background:#F6CC7E">＋</div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ npOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:87;background:rgba(6,8,16,.72);display:flex;align-items:center;justify-content:center;padding:18px" data-screen-label="New learning path">
+      <div style="background:#10131F;border:1px solid rgba(140,150,190,.25);border-radius:12px;max-width:560px;width:100%;max-height:84vh;display:flex;flex-direction:column;animation:rise .25s ease">
+        <div style="padding:13px 18px;border-bottom:1px solid rgba(140,150,190,.15);display:flex;align-items:center;gap:10px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8;flex:1">NEW LEARNING PATH</div>
+          <div onClick="{{ npCloseGo }}" style="cursor:pointer;color:#565E82;font-size:14px" style-hover="color:#EAEDF7">✕</div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:16px 18px;user-select:text;-webkit-user-select:text">
+          <sc-if value="{{ npStep1 }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8">WHAT DO YOU WANT TO LEARN?</div>
+            <input value="{{ npSubject }}" onChange="{{ npSubjectChange }}" placeholder="Cooking · Rust · Music theory · Wine · Anatomy…" style="width:100%;box-sizing:border-box;margin-top:7px;background:rgba(11,14,26,.7);border:1px solid rgba(140,150,190,.25);border-radius:8px;color:#EAEDF7;font-size:14px;padding:10px 12px;outline:none">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8;margin-top:14px">SIZE</div>
+            <div style="display:flex;gap:7px;margin-top:6px">
+              <div onClick="{{ npSizeCompactGo }}" style="{{ npSizeCompactS }}" style-hover="border-color:rgba(240,180,84,.55)">Compact · ~30 topics</div>
+              <div onClick="{{ npSizeFullGo }}" style="{{ npSizeFullS }}" style-hover="border-color:rgba(240,180,84,.55)">Full · ~60-90 topics</div>
+            </div>
+            <div onClick="{{ npCopyGo }}" style="display:inline-block;cursor:pointer;font-size:13px;font-weight:700;color:#171126;background:#F0B454;padding:9px 16px;border-radius:8px;margin-top:16px" style-hover="background:#F6CC7E">📋 Copy Graph Author Prompt</div>
+            <div style="font-size:11px;color:#7A82A8;line-height:1.55;margin-top:10px">Paste it into Claude, GPT or Gemini. Your AI builds the whole subject as one JSON block — bring that back here.</div>
+            <div onClick="{{ npToStep2Go }}" style="cursor:pointer;font-size:10.5px;color:#565E82;margin-top:10px" style-hover="color:#F0B454">I already have the JSON →</div>
+          </sc-if>
+          <sc-if value="{{ npStep2 }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8">PASTE WHAT YOUR AI RETURNED</div>
+            <textarea value="{{ npPaste }}" onChange="{{ npPasteChange }}" spellcheck="false" placeholder="the whole reply is fine — the JSON block is found automatically" style="width:100%;height:130px;box-sizing:border-box;margin-top:7px;background:rgba(11,14,26,.7);border:1px solid rgba(140,150,190,.22);border-radius:8px;color:#EAEDF7;font-size:10.5px;font-family:'IBM Plex Mono',monospace;line-height:1.5;padding:9px;resize:vertical;outline:none"></textarea>
+            <div style="display:flex;gap:10px;margin-top:8px;align-items:center">
+              <div onClick="{{ npValidateGo }}" style="cursor:pointer;font-size:12px;font-weight:700;color:#171126;background:#F0B454;padding:7px 14px;border-radius:7px" style-hover="background:#F6CC7E">Validate</div>
+              <div onClick="{{ npToStep1Go }}" style="cursor:pointer;font-size:10.5px;color:#565E82" style-hover="color:#8A92B8">← back</div>
+            </div>
+            <sc-if value="{{ npErrOn }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:#E4706F;margin-top:12px">{{ npErrHead }}</div>
+              <sc-for list="{{ npErrors }}" as="ne" hint-placeholder-count="0">
+                <div style="font-size:11px;line-height:1.5;color:#F0A9A8;padding-left:10px;text-indent:-10px;margin-top:3px">· {{ ne.t }}</div>
+              </sc-for>
+              <div onClick="{{ npFixGo }}" style="display:inline-block;cursor:pointer;font-size:11.5px;font-weight:700;color:#171126;background:#F0B454;padding:7px 12px;border-radius:7px;margin-top:9px" style-hover="background:#F6CC7E">📋 Copy Fix Prompt</div>
+            </sc-if>
+            <sc-if value="{{ npOkOn }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px solid rgba(127,220,184,.3);border-radius:9px;padding:10px 13px;margin-top:12px">
+                <div style="font-size:13px;font-weight:700;color:#A8DCC4">{{ npPreviewTitle }}</div>
+                <div style="font-size:11px;color:#8A92B8;margin-top:3px">{{ npPreviewSub }}</div>
+              </div>
+              <sc-if value="{{ npWarnOn }}" hint-placeholder-val="{{ false }}">
+                <sc-for list="{{ npWarnings }}" as="nw" hint-placeholder-count="0">
+                  <div style="font-size:10px;line-height:1.5;color:#7A82A8;padding-left:10px;text-indent:-10px;margin-top:3px">· {{ nw.t }}</div>
+                </sc-for>
+              </sc-if>
+              <div onClick="{{ npImportGo }}" style="display:inline-block;cursor:pointer;font-size:13px;font-weight:700;color:#171126;background:#F0B454;padding:9px 16px;border-radius:8px;margin-top:12px" style-hover="background:#F6CC7E">Import &amp; start learning</div>
+            </sc-if>
+          </sc-if>
+        </div>
+      </div>
     </div>
   </sc-if>
 
@@ -1188,7 +1240,7 @@ class Component extends DCLogic {
     route: null, focusRel: null, cardOpen: {}, handoff: null, hoOpen: {}, hoFull: false, intentDismissed: false,
     redisc: null, discovery: null, zseen: {}, collapse: null, curricula: {}, curEdit: null,
     taskState: {}, mis: {}, profile: { items: [], sessions: 0 }, evlog: [], paste: '', evPrev: null,
-    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided',
+    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided', newPack: null,
     q: '', toast: '', hint: false, hover: null, domainOpen: false, hist: [], loadErr: '', mobileSearch: false,
     legendOpen: false,
     isMobile: (typeof window !== 'undefined' ? window.innerWidth : 1200) < 720,
@@ -1317,10 +1369,245 @@ class Component extends DCLogic {
     requestAnimationFrame(step);
   }
   manifest = [{ id: 'default', file: 'graph.json', label: 'GRAPH' }];
+  // ---- custom packs: user-imported graph JSON living in localStorage ----
+  PACKS_KEY = 'knowledgeos_v1:packs';
+  packIds() { try { return JSON.parse(localStorage.getItem(this.PACKS_KEY) || '[]'); } catch (e) { return []; } }
+  readPack(id) { try { return JSON.parse(localStorage.getItem(this.KEYBASE + ':pack:' + id)); } catch (e) { return null; } }
+  mergeCustom() {
+    const customs = this.packIds().map(id => {
+      const j = this.readPack(id);
+      if (!j) return null;
+      return { id, label: (j._meta && j._meta.title) || id, sub: 'Custom pack · ' + (j.entities || []).length + ' topics', custom: true };
+    }).filter(Boolean).filter(c => !this.manifest.some(m => m.id === c.id));
+    this.manifest = [...this.manifest.filter(m => !m.custom || this.packIds().includes(m.id)), ...customs];
+  }
+  slugify(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 32) || 'pack'; }
+  extractJson(text) {
+    if (!text) return null;
+    const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (fence) { try { return JSON.parse(fence[1].trim()); } catch (e) {} }
+    let start = text.indexOf('{');
+    while (start >= 0) {
+      let depth = 0, inStr = false, esc = false;
+      for (let i = start; i < text.length; i++) {
+        const c = text[i];
+        if (esc) { esc = false; continue; }
+        if (c === '\\') { esc = true; continue; }
+        if (c === '"') { inStr = !inStr; continue; }
+        if (inStr) continue;
+        if (c === '{') depth++;
+        else if (c === '}') { depth--; if (depth === 0) { try { return JSON.parse(text.slice(start, i + 1)); } catch (e) { break; } } }
+      }
+      start = text.indexOf('{', start + 1);
+    }
+    return null;
+  }
+  // in-app port of validate.js (the Node CLI stays authoritative for authored packs)
+  validatePack(j) {
+    const errors = [], warnings = [];
+    const err = (m) => errors.push(m), warn = (m) => warnings.push(m);
+    if (!j || typeof j !== 'object' || Array.isArray(j)) return { errors: ['The paste is not a JSON object.'], warnings, stats: null };
+    const meta = j._meta || {};
+    if (!meta.id) err('_meta.id is required (a short slug like "cooking").');
+    if (!meta.title) warn('_meta.title missing — the domain switcher will show the raw id.');
+    if (!Array.isArray(j.entities) || !j.entities.length) { err('entities[] is required and must not be empty.'); return { errors, warnings, stats: null }; }
+    if (!Array.isArray(j.edges)) j.edges = [];
+    const UNIT_ARCH = { word: 'unit', concept: 'hub', grammar: 'context', situation: 'context', insight: 'note', culture: 'note', question: 'note' };
+    const kinds = { ...UNIT_ARCH };
+    const declaredKinds = new Set(Object.keys(UNIT_ARCH));
+    (j.kinds || []).forEach(k => { declaredKinds.add(k.k); kinds[k.k] = k.archetype || 'unit'; });
+    const declaredRels = new Set(['similar_to', 'associated_with', 'part_of', 'opposite_of', 'confused_with', 'derived_from', 'expresses', 'governs', 'used_in', 'explains', 'cultural_context', 'about', 'register_of', 'collocates_with', 'more_common_than']);
+    (j.rels || []).forEach(r => declaredRels.add(r.r));
+    (j.layers || []).forEach(l => (l.rels || []).forEach(r => { if (!declaredRels.has(r)) warn('layer "' + l.id + '" references undeclared rel "' + r + '"'); }));
+    const ids = new Set();
+    let hubs = 0, units = 0;
+    for (const e of j.entities) {
+      if (ids.has(e.i)) err('duplicate entity id "' + e.i + '"');
+      ids.add(e.i);
+      const kind = e.kind || 'word';
+      if (!declaredKinds.has(kind)) err('entity "' + e.i + '" has undeclared kind "' + kind + '"');
+      if (e.ex && e.bl && !e.ex.includes(e.bl)) err('entity "' + e.i + '": bl "' + e.bl + '" is not a substring of ex');
+      const arch = kinds[kind];
+      if (arch === 'hub') hubs++;
+      if (arch === 'unit') {
+        units++;
+        if (!e.en) warn('unit "' + e.i + '" has no en (meaning) — recall and cards will be empty');
+        if (!e.sy || !e.sy.length) warn('unit "' + e.i + '" has no sy — the recall practice step will be skipped');
+      }
+      if (arch === 'note' && !e.body && !e.note) warn('note "' + e.i + '" has no body');
+    }
+    const adjOut = {};
+    for (const e of j.edges) {
+      if (!ids.has(e.s) || !ids.has(e.t)) { err('edge ' + e.s + ' -[' + e.r + ']-> ' + e.t + ' references a missing entity'); continue; }
+      if (!declaredRels.has(e.r)) warn('edge ' + e.s + ' -> ' + e.t + ' uses undeclared rel "' + e.r + '"');
+      if (e.s === e.t) err('self-loop on "' + e.s + '" (' + e.r + ')');
+      (adjOut[e.s] = adjOut[e.s] || []).push(e);
+    }
+    const kindOfId = {}; j.entities.forEach(e => { kindOfId[e.i] = e.kind || 'word'; });
+    for (const e of j.entities) {
+      if (kinds[e.kind || 'word'] !== 'unit') continue;
+      const home = (adjOut[e.i] || []).some(x => x.r === 'expresses' || x.r === 'derived_from') || (e.x != null && e.y != null);
+      if (!home) warn('unit "' + e.i + '" has no expresses/derived_from edge or explicit x/y — layout will guess');
+    }
+    const seenPaths = new Set();
+    for (const p of (j.paths || [])) {
+      if (!p.id) err('path without id');
+      else if (seenPaths.has(p.id)) err('duplicate path id "' + p.id + '"');
+      seenPaths.add(p.id);
+      if (!p.start || !ids.has(p.start)) err('path "' + p.id + '": start "' + p.start + '" is not an existing entity');
+      (p.steps || []).forEach(s => { if (!ids.has(s)) err('path "' + p.id + '": step "' + s + '" is not an existing entity'); });
+    }
+    const hubEnts = j.entities.filter(e => kinds[e.kind || 'word'] === 'hub');
+    let ordCount = 0; const ordVals = new Set();
+    for (const h of hubEnts) {
+      if (h.ord === undefined) continue;
+      ordCount++;
+      if (typeof h.ord !== 'number') err('hub "' + h.i + '": ord must be a number');
+      else if (ordVals.has(h.ord)) warn('duplicate hub ord ' + h.ord + ' ("' + h.i + '")');
+      ordVals.add(h.ord);
+    }
+    if (ordCount > 0 && ordCount < hubEnts.length) warn('only ' + ordCount + '/' + hubEnts.length + ' hubs carry ord — the rest fall back to derived ranking');
+    const color = {}, stack = [];
+    const dfs = (n) => {
+      color[n] = 1; stack.push(n);
+      for (const e of (adjOut[n] || [])) {
+        if (e.r !== 'requires' && e.r !== 'builds_on') continue;
+        if (color[e.t] === 1) { err('dependency cycle: ' + [...stack.slice(stack.indexOf(e.t)), e.t].join(' -> ')); continue; }
+        if (!color[e.t]) dfs(e.t);
+      }
+      color[n] = 2; stack.pop();
+    };
+    ids.forEach(n => { if (!color[n]) dfs(n); });
+    if (!hubs) err('no concept hubs — at least one entity with a hub-archetype kind (e.g. "concept") is required');
+    if (units < 5) err('only ' + units + ' learnable units — a pack needs at least 5');
+    return { errors, warnings, stats: { entities: j.entities.length, edges: j.edges.length, hubs, units, title: meta.title || meta.id || 'untitled' } };
+  }
+  buildPackPrompt(subject, size) {
+    const compact = size !== 'full';
+    const L = [];
+    L.push(this.PROMPT_COVER);
+    L.push('');
+    L.push('You are a knowledge cartographer and curriculum architect. Build me a complete LEARNING KNOWLEDGE GRAPH PACK for the subject: "' + subject + '". The pack is a single JSON document consumed by a learning app (KnowledgeOS); it becomes my study plan, my session prompts and my spaced-repetition schedule, so content quality matters more than coverage.');
+    L.push('');
+    L.push('== CHOOSE THE FLAVOR ==');
+    L.push('Decide by subject type. LANGUAGE-like subjects (a human language, vocabulary-heavy): units are kind "word" with articles where relevant, plus kind "grammar" rules and "situation" scenes; add conj objects for verbs and sy recall keys. SKILL/SCIENCE-like subjects (cooking, programming, music theory, a science): declare your own unit kinds via the kinds[] array (archetype "unit"), lean on requires/builds_on dependency edges between units, and add failure/tradeoff-style note kinds where the field has real failure modes.');
+    L.push('');
+    L.push('== THE SCHEMA (all field names exact) ==');
+    L.push('{');
+    L.push('  "_meta": { "id": "short-slug", "title": "Subject Name", "subtitle": "one-line tagline", "unitSingular": "topic", "unitPlural": "topics", "recallPrompt": "What does this mean?" },');
+    L.push('  "kinds":  [ { "k": "technique", "archetype": "unit", "label": "Technique" } ],           // optional: declare custom kinds; archetype is one of unit|hub|context|note');
+    L.push('  "rels":   [ { "r": "requires", "label": "requires" } ],                                  // optional: extra relationship types beyond the built-ins');
+    L.push('  "paths":  [ { "id": "starter", "title": "First steps", "start": "hub_id", "steps": ["unit_id_1", "unit_id_2"] } ],   // optional: one authored beginner route');
+    L.push('  "entities": [');
+    L.push('    { "i": "hub_id", "kind": "concept", "w": "Cluster name", "en": "what this cluster is about", "ord": 1 },');
+    L.push('    { "i": "unit_id", "kind": "word_or_custom_unit_kind", "w": "Topic name", "en": "short meaning", "why": "why this exists / first principles", "ex": "a natural example sentence or scenario", "bl": "the exact substring of ex to blank in cloze practice", "sy": ["recall", "keywords"], "f": 4, "mk": "the classic confusion or trap, if any" },');
+    L.push('    { "i": "insight_id", "kind": "insight", "w": "Short insight name", "q": "A question that hooks it?", "body": "the insight, 2-3 sentences" }');
+    L.push('  ],');
+    L.push('  "edges": [ { "s": "unit_id", "t": "hub_id", "r": "expresses" }, { "s": "unit_id_2", "t": "unit_id", "r": "requires" }, { "s": "unit_a", "t": "unit_b", "r": "confused_with", "x": "one line on how they differ" }, { "s": "insight_id", "t": "unit_id", "r": "explains" } ]');
+    L.push('}');
+    L.push('');
+    L.push('== CONTENT RULES ==');
+    L.push('- Every unit MUST have: en, why, ex (with bl an exact substring of ex), sy (2-4 recall keys), f (1-5 how often practitioners use it).');
+    L.push('- Every unit MUST have exactly one "expresses" edge to its hub (this places it on the map).');
+    L.push('- Hubs: kind "concept", 1 per cluster, each with en and ord (1..N in beginner-first order).');
+    L.push('- Dependencies: use requires/builds_on between units where one genuinely presupposes the other. The dependency graph MUST be acyclic. For skill subjects this is the backbone — be generous but honest.');
+    L.push('- Confusions: for every pair beginners mix up, add a confused_with edge with an "x" note explaining the difference.');
+    L.push('- Insights: 3-8 question-led capsules (kind "insight") wired to their units via "explains" edges.');
+    L.push('- ' + (compact ? 'SIZE: compact — 3-5 hubs, 25-40 units total.' : 'SIZE: full — 6-9 hubs, 55-90 units total.'));
+    L.push('');
+    L.push('== SELF-CHECK BEFORE ANSWERING (the app validates all of this mechanically) ==');
+    L.push('- ids unique; every edge endpoint exists; no self-loops; no requires/builds_on cycles.');
+    L.push('- bl is a literal substring of ex, character for character.');
+    L.push('- every custom kind you use is declared in kinds[]; every custom rel in rels[].');
+    L.push('- at least 1 hub and at least 5 units; every hub carries ord.');
+    L.push('');
+    L.push('== DELIVERABLE SCOPE ==');
+    L.push('Your ENTIRE response is ONE fenced json code block containing the pack. No commentary before or after, no explanations, no parts, no follow-up offers. If the full size does not fit in one response, reduce the number of units — never split across messages.');
+    L.push('');
+    L.push('Begin immediately. Do not ask what I want — produce the complete JSON pack now.');
+    return L.join('\n');
+  }
+  // ---- New Learning Path modal handlers ----
+  npOpen = () => this.setState({ newPack: { step: 1, subject: '', size: 'compact', paste: '', result: null }, domainOpen: false });
+  npClose = () => this.setState({ newPack: null });
+  npPatch(patch) { this.setState({ newPack: { ...this.state.newPack, ...patch } }); }
+  npCopyPrompt = () => {
+    const np = this.state.newPack;
+    if (!np.subject.trim()) { this.showToast('Type what you want to learn first'); return; }
+    const text = this.buildPackPrompt(np.subject.trim(), np.size);
+    const done = (ok) => { this.showToast(ok ? 'Graph author prompt copied — paste it into your AI' : 'Copy failed'); if (ok) this.npPatch({ step: 2 }); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true)).catch(() => this.copyFallback(text, done));
+    else this.copyFallback(text, done);
+  };
+  npValidate = () => {
+    const np = this.state.newPack;
+    const json = this.extractJson(np.paste);
+    if (!json) { this.npPatch({ result: { errors: ['No JSON found in the paste — include the whole fenced block your AI returned.'], warnings: [], stats: null, json: null } }); return; }
+    const r = this.validatePack(json);
+    this.npPatch({ result: { ...r, json: r.errors.length ? null : json } });
+  };
+  npCopyFix = () => {
+    const np = this.state.newPack;
+    const errs = (np.result && np.result.errors) || [];
+    const text = [this.PROMPT_COVER, '', 'The JSON pack you produced failed mechanical validation. Fix ALL of these issues and return the corrected COMPLETE pack as ONE fenced json code block, nothing else — no commentary, no partial output:', '', ...errs.map(e2 => '- ' + e2)].join('\n');
+    const done = (ok) => this.showToast(ok ? 'Fix prompt copied — paste it into the same conversation' : 'Copy failed');
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true)).catch(() => this.copyFallback(text, done));
+    else this.copyFallback(text, done);
+  };
+  npImport = () => {
+    const np = this.state.newPack;
+    if (!np.result || !np.result.json) return;
+    const json = np.result.json;
+    let id = this.slugify((json._meta && json._meta.id) || np.subject);
+    const taken = new Set(this.manifest.map(m => m.id).concat(this.packIds()));
+    let n = 2; const base = id;
+    while (taken.has(id)) id = base + '-' + (n++);
+    json._meta = { ...(json._meta || {}), id }; // KEY safety: stored _meta.id must equal the registry id
+    delete json._meta.legacy;
+    try {
+      localStorage.setItem(this.KEYBASE + ':pack:' + id, JSON.stringify(json));
+      localStorage.setItem(this.PACKS_KEY, JSON.stringify([...this.packIds(), id]));
+    } catch (e) { this.showToast('Could not store the pack (storage full?)'); return; }
+    this.mergeCustom();
+    this.setState({ newPack: null }, () => {
+      this.showToast('Pack imported — welcome to ' + ((json._meta && json._meta.title) || id));
+      this.loadGraph(this.manifest.find(g => g.id === id));
+    });
+  };
+  downloadPack(id) {
+    const j = this.readPack(id); if (!j) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(j, null, 1)], { type: 'application/json' }));
+    a.download = id + '-pack.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+  removePack(id) {
+    if (this._rmArm !== id) {
+      this._rmArm = id;
+      this.showToast('Tap "remove" again to delete this pack and its progress');
+      setTimeout(() => { if (this._rmArm === id) this._rmArm = null; }, 4000);
+      return;
+    }
+    this._rmArm = null;
+    try {
+      localStorage.removeItem(this.KEYBASE + ':pack:' + id);
+      localStorage.removeItem(this.KEYBASE + ':' + id);
+      localStorage.setItem(this.PACKS_KEY, JSON.stringify(this.packIds().filter(x => x !== id)));
+    } catch (e) {}
+    this.manifest = this.manifest.filter(m => m.id !== id);
+    this.mergeCustom();
+    const active = this.graphEntry && this.graphEntry.id === id;
+    this.setState({ domainOpen: false }, () => {
+      this.showToast('Pack removed');
+      if (active) this.loadGraph(this.manifest.find(m => !m.custom) || this.manifest[0]);
+    });
+  }
   componentDidMount() {
     try { window.__ko = this; } catch (e) {}
     fetch('graphs.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null).then(man => {
       if (man && man.graphs && man.graphs.length) this.manifest = man.graphs;
+      this.mergeCustom(); // custom packs must join BEFORE ?graph=/:last resolution below
       let last = null; try { last = localStorage.getItem(this.KEYBASE + ':last'); } catch (e) {}
       let fromUrl = null; try { fromUrl = new URLSearchParams(window.location.search).get('graph'); } catch (e) {}
       this.loadGraph(this.manifest.find(g => g.id === fromUrl) || this.manifest.find(g => g.id === last) || this.manifest[0]);
@@ -1330,7 +1617,7 @@ class Component extends DCLogic {
     this._onKey = (e) => {
       if (e.key === 'Escape') {
         clearTimeout(this._rdT); clearTimeout(this._dscT); clearTimeout(this._clT); this._pendingHO = null;
-        this.setState({ selId: null, exp: false, prac: null, q: '', domainOpen: false, mobileSearch: false, handoff: null, focusRel: null, redisc: null, discovery: null, collapse: null, curEdit: null, evPrev: null });
+        this.setState({ selId: null, exp: false, prac: null, q: '', domainOpen: false, mobileSearch: false, handoff: null, focusRel: null, redisc: null, discovery: null, collapse: null, curEdit: null, evPrev: null, newPack: null });
       }
       if (e.key === '/' && !this.state.prac) {
         const inp = document.querySelector('input[placeholder="Search entities"]');
@@ -1373,7 +1660,10 @@ class Component extends DCLogic {
       this._autoplanP = qp.get('autoplan') === '1'; // dev/screenshot affordance: generate a default plan on load
     } catch (e) {}
     this.setState({ ready: false, loadErr: '' });
-    fetch(entry.file, { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(j => {
+    const src = entry.custom
+      ? new Promise((res, rej) => { const j = this.readPack(entry.id); if (j) res(j); else rej(new Error('pack missing')); })
+      : fetch(entry.file, { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    src.then(j => {
       this.graphEntry = entry;
       this.graphJson = j;
       this.applyOntology(j);
@@ -1421,7 +1711,7 @@ class Component extends DCLogic {
         if (this._autoplanP && !this.state.plan) { this._autoplanP = false; this.generatePlan(this.todayISO(), this.DEFAULT_TEMPLATE); }
         if (this.state.view === 'journey') this.scrollJourney();
       });
-    }).catch(e => this.setState({ loadErr: 'Failed to load ' + entry.file, toast: 'Failed to load ' + entry.file, ready: true, layer: 'all' }));
+    }).catch(e => { const what = entry.file || 'local pack "' + entry.id + '"'; this.setState({ loadErr: 'Failed to load ' + what, toast: 'Failed to load ' + what, ready: true, layer: 'all' }); });
   }
   fitCam(animate) {
     // frame the visible graph (hubs + revealed + frontier) instead of assuming one canvas extent
@@ -1440,7 +1730,7 @@ class Component extends DCLogic {
     if (this.graphEntry && entry.id === this.graphEntry.id) { this.setState({ domainOpen: false }); return; }
     this.loadGraph(entry);
   }
-  domainToggle = () => { if (this.manifest.length > 1) this.setState({ domainOpen: !this.state.domainOpen }); };
+  domainToggle = () => this.setState({ domainOpen: !this.state.domainOpen }); // always openable: the dropdown carries pack + data actions now
   componentWillUnmount() { window.removeEventListener('resize', this._onResize); window.removeEventListener('keydown', this._onKey); }
 
   ns(id) { return this.state.states[id] || { st: 'unknown', m: 0 }; }
@@ -2395,7 +2685,7 @@ Additionally:
   // as content to discuss ("what would you like me to do with this?") — this cover line is
   // addressed to exactly that failure mode
   PROMPT_COVER = 'NOTE TO THE AI READING THIS: whether this text reaches you as a message or as an attached/pasted document, it IS your prompt and your complete instructions. Do not summarize it, do not describe it, do not ask what to do with it — execute it now.';
-  BUILD_TAG = 'v0808a';
+  BUILD_TAG = 'v0809a';
   setPromptStyle(v) {
     const pstyle = v === 'zoltraak' ? 'zoltraak' : 'guided';
     try { localStorage.setItem(this.KEYBASE + ':style', pstyle); } catch (e) {}
@@ -4256,6 +4546,40 @@ Separate search from justification. Internally search broadly; then forget the s
       jFooter = doneN + ' OF ' + total + ' SESSIONS' + (behind ? ' · CATCH UP TONIGHT' : ' · KEEP GOING') + '  ·  J/K MOVE · X CHECK · O CLOSE · T TIMER · P PRINT  ·  ' + this.BUILD_TAG.toUpperCase();
     }
 
+    // ---- New Learning Path modal feed ----
+    const np = S.newPack;
+    const npSizeChip = (on) => ({ cursor: 'pointer', fontSize: 11, padding: '7px 11px', borderRadius: 7, border: '1px solid ' + (on ? 'rgba(240,180,84,.45)' : 'rgba(140,150,190,.2)'), color: on ? '#F0B454' : '#8A92B8', background: on ? 'rgba(240,180,84,.06)' : 'transparent', whiteSpace: 'nowrap' });
+    const npR = np && np.result;
+    const npV = {
+      npOn: !!np,
+      npStep1: !!np && np.step === 1,
+      npStep2: !!np && np.step === 2,
+      npSubject: np ? np.subject : '',
+      npSubjectChange: (e) => this.npPatch({ subject: e.target.value }),
+      npSizeCompactGo: () => this.npPatch({ size: 'compact' }),
+      npSizeFullGo: () => this.npPatch({ size: 'full' }),
+      npSizeCompactS: npSizeChip(!np || np.size === 'compact'),
+      npSizeFullS: npSizeChip(!!np && np.size === 'full'),
+      npCopyGo: this.npCopyPrompt,
+      npToStep2Go: () => this.npPatch({ step: 2 }),
+      npToStep1Go: () => this.npPatch({ step: 1 }),
+      npPaste: np ? np.paste : '',
+      npPasteChange: (e) => this.npPatch({ paste: e.target.value }),
+      npValidateGo: this.npValidate,
+      npErrOn: !!(npR && npR.errors && npR.errors.length),
+      npErrHead: npR && npR.errors ? npR.errors.length + ' ISSUE' + (npR.errors.length === 1 ? '' : 'S') + ' — FIX AND REVALIDATE' : '',
+      npErrors: npR && npR.errors ? npR.errors.map(t => ({ t })) : [],
+      npFixGo: this.npCopyFix,
+      npOkOn: !!(npR && npR.json),
+      npPreviewTitle: npR && npR.stats ? npR.stats.title : '',
+      npPreviewSub: npR && npR.stats ? npR.stats.hubs + ' clusters · ' + npR.stats.units + ' topics · ' + npR.stats.edges + ' connections' + (npR.warnings.length ? ' · ' + npR.warnings.length + ' warnings' : '') : '',
+      npWarnOn: !!(npR && npR.json && npR.warnings.length),
+      npWarnings: npR && npR.warnings ? npR.warnings.slice(0, 8).map(t => ({ t })) : [],
+      npImportGo: this.npImport,
+      npCloseGo: this.npClose,
+      npOpenGo: this.npOpen
+    };
+
     // ---- Learn mode: routes panel + guided-route HUD ----
     const routesOn = S.view === 'galaxy' && S.mode === 'learn' && !S.route && !S.selId && !S.exp && !S.prac && !S.redisc && !S.discovery && S.ready;
     let routeRows = [];
@@ -4362,20 +4686,32 @@ Separate search from justification. Internally search broadly; then forget the s
       onPD: this.onPD, onPM: this.onPM, onPU: this.onPU,
       ...tip,
       loadingOn: !S.ready,
-      loadingText: 'LOADING ' + (this.graphEntry ? this.graphEntry.file : 'graph.json'),
+      loadingText: 'LOADING ' + (this.graphEntry ? (this.graphEntry.file || this.graphEntry.label || this.graphEntry.id) : 'graph.json'),
       errOn: S.ready && !!S.loadErr, errText: S.loadErr + ' — check that the file is served next to the app.', errRetry: () => this.loadGraph(this.graphEntry || this.manifest[0]),
       appTitle: 'KnowledgeOS',
       appSub: (this.meta.subtitle || 'KNOWLEDGE GRAPH').toUpperCase(),
-      domainCaret: this.manifest.length > 1 ? '  ▾' : '',
+      domainCaret: '  ▾',
       domainToggle: this.domainToggle,
       domainPillS: { fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: '#7A82A8', letterSpacing: '.1em', whiteSpace: 'nowrap', cursor: this.manifest.length > 1 ? 'pointer' : 'default', padding: '3px 0' },
       domainDropOn: S.domainOpen,
-      domainRows: this.manifest.map(g => ({
-        label: (g.label || g.id).toUpperCase(),
-        sub: g.sub || g.file,
-        go: () => this.switchDomain(g),
-        s: { cursor: 'pointer', padding: '8px 10px', borderRadius: 7, color: activeId === g.id ? '#F0B454' : '#EAEDF7' }
-      })),
+      domainRows: (() => {
+        const rows = this.manifest.map(g => ({
+          label: (g.label || g.id).toUpperCase() + (g.custom ? ' ·' : ''),
+          sub: g.sub || g.file || 'custom pack',
+          go: () => this.switchDomain(g),
+          s: { cursor: 'pointer', padding: '8px 10px', borderRadius: 7, color: activeId === g.id ? '#F0B454' : '#EAEDF7' }
+        }));
+        const actS = { cursor: 'pointer', padding: '7px 10px', borderRadius: 7, color: '#F0B454', borderTop: '1px solid rgba(140,150,190,.12)', marginTop: 3 };
+        const dimS = { cursor: 'pointer', padding: '7px 10px', borderRadius: 7, color: '#8A92B8' };
+        rows.push({ label: '＋ NEW LEARNING PATH', sub: 'your AI builds the subject — you import it', go: this.npOpen, s: actS });
+        rows.push({ label: 'EXPORT PROGRESS', sub: 'this domain, as a JSON file', go: () => { this.setState({ domainOpen: false }); this.exportProgress(); }, s: dimS });
+        rows.push({ label: 'IMPORT PROGRESS', sub: 'restore from an exported file', go: () => { this.setState({ domainOpen: false }); this.importProgress(); }, s: dimS });
+        if (this.graphEntry && this.graphEntry.custom) {
+          rows.push({ label: 'DOWNLOAD THIS PACK', sub: 'share the graph as a file', go: () => this.downloadPack(activeId), s: dimS });
+          rows.push({ label: 'REMOVE THIS PACK…', sub: 'deletes the pack and its progress', go: () => this.removePack(activeId), s: { ...dimS, color: '#E4706F' } });
+        }
+        return rows;
+      })(),
       unitLabel: this.unitPlural(),
       unitStateLabel: S.mode === 'review' ? 'REVIEW URGENCY' : this.unitSingular() + ' STATE',
       statChipS: (() => {
@@ -4507,6 +4843,7 @@ Separate search from justification. Internally search broadly; then forget the s
       journeyOn, jChapters, jFooter,
       setupOn, setupDomain, setupDays, setupStart, setupStartChange, setupDomainGo, setupPreview, setupNote, setupGenerateGo,
       planOn, jWhere, jDelta, jDeltaS, jDeltaSub, jReplanOn, jReplanGo, jReportGo, jProgFillS, jProgTxt, jDriftOn, jRebuildGo, jDroppedOn, jDropped, jDueOn, jDueTxt, jDueGo,
+      ...npV,
       panelOn: ((!!S.selId || S.exp || !!S.prac || routesOn) && S.view === 'galaxy') || (!!S.prac && S.view === 'journey'),
       panelStyle: S.isMobile
         ? { position: 'fixed', left: 0, right: 0, bottom: 0, height: '64vh', zIndex: 40, background: '#10131F', borderTop: '1px solid rgba(140,150,190,.22)', borderRadius: '14px 14px 0 0', animation: 'rise .3s ease', display: 'flex', flexDirection: 'column', overflow: 'hidden' }
