@@ -1953,7 +1953,7 @@ class Component extends DCLogic {
     const rcWhy = new Map(((((result || {})._merge || {}).reclassified) || []).map(c => [c.id, c.why || '']));
     const added = [], removed = [], renamed = [], reclassified = [], consolidated = [];
     let contentChanged = 0, surviving = 0;
-    const cHash = (e) => this.djb2([e.en || '', e.why || '', e.ex || '', e.bl || '', (e.sy || []).join('|'), e.mk || ''].join(' '));
+    const cHash = (e) => this.djb2([e.en || '', e.why || '', e.ex || '', e.bl || '', (e.sy || []).join('|'), e.mk || ''].join('\u0000'));
     for (const [id, se] of srcUnit) {
       if (resUnits.has(id)) {
         surviving++;
