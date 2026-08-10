@@ -850,7 +850,7 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
             <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8;margin-top:14px">{{ mgIntentLabel }}</div>
             <textarea value="{{ mgIntent }}" onChange="{{ mgIntentChange }}" spellcheck="false" placeholder="{{ mgIntentPh }}" style="width:100%;height:52px;box-sizing:border-box;margin-top:6px;background:rgba(11,14,26,.7);border:1px solid rgba(140,150,190,.22);border-radius:8px;color:#EAEDF7;font-size:12px;line-height:1.5;padding:9px;resize:vertical;outline:none"></textarea>
             <sc-if value="{{ mgSizeWarnOn }}" hint-placeholder-val="{{ false }}">
-              <div style="font-size:10.5px;color:#F0B454;margin-top:8px">These packs are large — for better results, merge two at a time.</div>
+              <div style="font-size:10.5px;color:#F0B454;margin-top:8px">{{ mgSizeWarnText }}</div>
             </sc-if>
             <div onClick="{{ mgCopyGo }}" style="display:inline-block;cursor:pointer;font-size:13px;font-weight:700;color:#171126;background:#F0B454;padding:9px 16px;border-radius:8px;margin-top:14px" style-hover="background:#F6CC7E">📋 {{ mgCopyLabel }}</div>
             <div onClick="{{ mgToStep2Go }}" style="cursor:pointer;font-size:10.5px;color:#565E82;margin-top:10px" style-hover="color:#F0B454">I already have the JSON →</div>
@@ -874,18 +874,39 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
                 <div style="font-size:13px;font-weight:700;color:#A8DCC4">{{ mgPreviewTitle }}</div>
                 <div style="font-size:11px;color:#B9C1DE;margin-top:4px">{{ mgHeadline }}</div>
               </div>
+              <sc-if value="{{ mgInterp }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:11.5px;line-height:1.55;color:#D9DEF2;border-left:3px solid rgba(240,180,84,.6);padding:3px 0 3px 11px;margin-top:11px;font-style:italic">"{{ mgInterp }}"</div>
+              </sc-if>
+              <sc-if value="{{ mgWarnOn }}" hint-placeholder-val="{{ false }}">
+                <sc-for list="{{ mgWarnings }}" as="mw" hint-placeholder-count="0">
+                  <div style="font-size:10.5px;line-height:1.5;color:#F0B454;padding-left:14px;text-indent:-14px;margin-top:4px">⚠ {{ mw.t }}</div>
+                </sc-for>
+              </sc-if>
+              <sc-if value="{{ mgDiffOn }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;color:#565E82;margin-top:13px">PROPOSED SURGERY · GRAPH CHANGES</div>
+                <sc-for list="{{ mgDiffRows }}" as="md" hint-placeholder-count="0">
+                  <div style="display:flex;gap:8px;font-size:11px;line-height:1.55;margin-top:3px"><span style="{{ md.iconS }}">{{ md.icon }}</span><span style="color:#B9C1DE;flex:1">{{ md.t }}</span></div>
+                </sc-for>
+              </sc-if>
               <sc-for list="{{ mgReportLines }}" as="mr" hint-placeholder-count="0">
                 <div style="font-size:10.5px;line-height:1.55;color:#7A82A8;padding-left:10px;text-indent:-10px;margin-top:3px">· {{ mr.t }}</div>
               </sc-for>
+              <sc-if value="{{ mgImpactOn }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;color:#565E82;margin-top:13px">{{ mgImpactHead }}</div>
+                <sc-for list="{{ mgImpactRows }}" as="mi" hint-placeholder-count="0">
+                  <div style="display:flex;gap:8px;font-size:11px;line-height:1.55;margin-top:3px"><span style="{{ mi.iconS }}">{{ mi.icon }}</span><span style="color:#B9C1DE;flex:1">{{ mi.t }}</span></div>
+                </sc-for>
+              </sc-if>
               <div onClick="{{ mgCarryGo }}" style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:12px">
                 <span style="{{ mgCarryMarkS }}">{{ mgCarryMark }}</span>
                 <span style="font-size:11.5px;color:#B9C1DE">Carry my progress from the source packs</span>
               </div>
-              <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+              <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
                 <div onClick="{{ mgImportGo }}" style="cursor:pointer;font-size:13px;font-weight:700;color:#171126;background:#F0B454;padding:9px 16px;border-radius:8px" style-hover="background:#F6CC7E">{{ mgImportLabel }}</div>
-                <sc-if value="{{ mgReplaceOn }}" hint-placeholder-val="{{ false }}">
-                  <div onClick="{{ mgReplaceGo }}" style="cursor:pointer;font-size:11px;color:#E4706F" style-hover="color:#F0A9A8">replace the original instead</div>
+                <sc-if value="{{ mgAltOn }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ mgAltGo }}" style="cursor:pointer;font-size:11px;color:#8A92B8" style-hover="color:#EAEDF7">{{ mgAltLabel }}</div>
                 </sc-if>
+                <div onClick="{{ mgCloseGo }}" style="cursor:pointer;font-size:11px;color:#565E82" style-hover="color:#E4706F">Cancel</div>
               </div>
             </sc-if>
           </sc-if>
@@ -1735,7 +1756,7 @@ class Component extends DCLogic {
     const slim = { ...j, entities: (j.entities || []).map(e => { const { x, y, ...rest } = e; return rest; }) };
     return JSON.stringify(slim);
   }
-  buildMergePrompt(sources, intent, surgery) {
+  buildMergePrompt(sources, intent, surgery, ctxHub) {
     // sources: [{id, json}]
     const L = [];
     L.push(this.PROMPT_COVER);
@@ -1764,11 +1785,37 @@ class Component extends DCLogic {
     L.push('- Re-derive the hub set and hub "ord" (beginner-first) for the result; the requires/builds_on graph must stay acyclic.');
     L.push('- Every unit keeps/receives: en, why, ex (with bl an exact substring of ex), sy, f. Same schema as the sources.');
     L.push('- _meta: ' + (surgery ? 'keep the source _meta (id may stay).' : 'a NEW id slug and title for the merged pack.'));
+    if (surgery) {
+      L.push('');
+      L.push('== THE THREE LAYERS (interpret my instruction against these) ==');
+      L.push('1. EXISTENCE — does the concept belong in the knowledge model at all? True removal is only for concepts that are wrong or out of scope → _merge.rejected with a reason.');
+      L.push('2. PRIORITY — how much this learning path needs it: the "pr" field (core|useful|detail|skip; absent = useful). "Remove X" usually means DEMOTE, not delete: set pr to "detail" (kept in the graph, off the scheduled path) or "skip". Reclassify instead of reject whenever the concept is real but over-detailed; record every pr change in _merge.reclassified.');
+      L.push('3. SCHEDULE — when it is studied. Not yours: the app derives sessions deterministically from the graph and priorities. Never encode dates or session structure in the pack.');
+      L.push('');
+      L.push('Before changing anything, state your interpretation in _merge.interpretation — one or two sentences, e.g. "You asked to remove Softmax; removing it would break the dependency chain to Attention, so I demoted it to detail instead." When my instruction is ambiguous between layers, choose the LEAST destructive interpretation and say which alternatives you rejected.');
+    }
     L.push('');
     L.push('== THE CHANGE REPORT (inside the JSON — your only deliverable is still one JSON block) ==');
     L.push('Add a top-level "_merge" object:');
-    L.push('{ "source_packs": [' + sources.map(s => '"' + s.id + '"').join(', ') + '], "preserved": N, "enriched": ["id"], "consolidated": [{ "into": "id", "from": ["id"], "why": "…" }], "bridges": [{ "id": "…", "why": "…" }], "coverage_added": [{ "id": "…", "why": "…" }], "rejected": [{ "id": "…", "reason": "…" }] }');
+    L.push('{ "source_packs": [' + sources.map(s => '"' + s.id + '"').join(', ') + '], "interpretation": "…", "preserved": N, "enriched": ["id"], "consolidated": [{ "into": "id", "from": ["id"], "why": "…" }], "reclassified": [{ "id": "…", "from": "core", "to": "detail", "why": "…" }], "bridges": [{ "id": "…", "why": "…" }], "coverage_added": [{ "id": "…", "why": "…" }], "rejected": [{ "id": "…", "reason": "…" }] }');
     L.push('');
+    if (surgery && ctxHub) {
+      const hb = this.G && this.G.byId[ctxHub];
+      const memIds = hb ? this.membersOf(ctxHub).map(m => m.i) : [];
+      if (hb) {
+        L.push('== TARGET CLUSTER ==');
+        L.push('Operate on the cluster "' + hb.w + '" (' + [ctxHub, ...memIds].join(', ') + '). Restrict changes to this cluster unless the instruction requires touching its neighbors.');
+        L.push('');
+      }
+    }
+    if (surgery && this.state.plan && this.graphEntry && sources.length === 1 && sources[0].id === this.graphEntry.id) {
+      const dig = this.journeyDigestLines();
+      if (dig.length) {
+        L.push('== MY CURRENT STUDY JOURNEY (context for your interpretation only — do not modify it, do not reference it in the output JSON) ==');
+        dig.forEach(d => L.push(d));
+        L.push('');
+      }
+    }
     sources.forEach((s, i) => {
       L.push('== SOURCE PACK ' + (i + 1) + ' (' + s.id + ') ==');
       L.push(this.packDigest(s.json, 'full'));
@@ -1779,7 +1826,9 @@ class Component extends DCLogic {
     L.push('- ids unique; every edge endpoint exists; no self-loops; no requires/builds_on cycles; bl is a literal substring of ex; custom kinds/rels declared.');
     L.push('');
     L.push('== DELIVERABLE SCOPE ==');
-    L.push('Your ENTIRE response is ONE fenced json code block containing the complete ' + (surgery ? 'modified' : 'merged') + ' pack (with _merge inside). No commentary, no parts, no follow-ups. If it will not fit, consolidate harder — never split across messages.');
+    L.push('Your ENTIRE response is ONE fenced json code block containing the complete ' + (surgery ? 'modified' : 'merged') + ' pack (with _merge inside). No commentary, no parts, no follow-ups. ' + (surgery
+      ? 'Never drop, merge, or shorten content to make the pack fit — this pack is a live curriculum someone has progress in. If you cannot return it complete, reply with one plain sentence saying so instead of a JSON block.'
+      : 'If it will not fit, consolidate harder — never split across messages.'));
     L.push('');
     L.push('Begin immediately. Do not ask what I want — produce the complete JSON now.');
     return L.join('\n');
@@ -1798,12 +1847,18 @@ class Component extends DCLogic {
       if (lost.length) v.errors.push('silently lost source topics (each must survive, be consolidated, or be rejected with a reason): ' + lost.join(', '));
       const living = new Set(json.entities.map(e => e.i));
       json.entities.forEach(e => (e.al || []).forEach(a => { if (living.has(a)) v.warnings.push('alias "' + a + '" on "' + e.i + '" collides with a living unit id'); }));
+      (((report || {}).reclassified) || []).forEach(c => {
+        if (c && c.id && !living.has(c.id)) v.errors.push('reclassified "' + c.id + '" does not survive in the result — reclassification requires survival; use rejected for removals');
+        else if (c && c.id) { const ent = json.entities.find(e2 => e2.i === c.id); const actual = (ent && this.PR_LEVELS.includes(ent.pr)) ? ent.pr : 'useful'; if (c.to && c.to !== actual) v.warnings.push('_merge.reclassified says "' + c.id + '" → ' + c.to + ' but the entity carries pr "' + actual + '" — the entities are the truth'); }
+      });
+      if (report && !report.interpretation && this.state.merge && this.state.merge.mode === 'surgery') v.warnings.push('no _merge.interpretation — the surgeon did not state its reading of your instruction');
     }
     return v;
   }
   mergeReportLines(json) {
     const r = (json && json._merge) || {};
     const lines = [];
+    (r.reclassified || []).forEach(c => lines.push('reclassified: ' + (c.id || '?') + ' ' + (c.from || '?') + ' → ' + (c.to || '?') + (c.why ? ' — ' + c.why : '')));
     (r.consolidated || []).forEach(c => lines.push('consolidated: ' + (c.into || '?') + ' ← ' + ((c.from || []).join(', ')) + (c.why ? ' — ' + c.why : '')));
     (r.bridges || []).forEach(b => lines.push('bridge added: ' + (b.id || '?') + (b.why ? ' — ' + b.why : '')));
     (r.coverage_added || []).forEach(b => lines.push('coverage added: ' + (b.id || '?') + (b.why ? ' — ' + b.why : '')));
@@ -1819,8 +1874,89 @@ class Component extends DCLogic {
     if ((r.consolidated || []).length) parts.push(r.consolidated.length + ' consolidated');
     if ((r.bridges || []).length) parts.push(r.bridges.length + ' bridges added');
     if ((r.coverage_added || []).length) parts.push(r.coverage_added.length + ' coverage gaps filled');
+    if ((r.reclassified || []).length) parts.push(r.reclassified.length + ' reclassified');
     if ((r.rejected || []).length) parts.push(r.rejected.length + ' rejected');
     return 'From ' + srcCount + ' source topics: ' + parts.join(' · ');
+  }
+  // ---- Deterministic diff: KnowledgeOS decides what structurally happened — never the AI's report.
+  // Alias/consolidation maps are built over ALL entities (notes carry states too), never unitIdsOf.
+  prOfEnt(e) { return (e && this.PR_LEVELS.includes(e.pr)) ? e.pr : 'useful'; }
+  computeSurgeryDiff(sources, result) {
+    const srcUnit = new Map(); // unit id -> source entity (first pack wins)
+    const srcEnts = new Map(); // ALL entities, for the remap surface
+    sources.forEach(s => {
+      const byId = new Map(((s.json && s.json.entities) || []).map(e => [e.i, e]));
+      byId.forEach((e, id) => { if (!srcEnts.has(id)) srcEnts.set(id, e); });
+      this.unitIdsOf(s.json).forEach(id => { if (!srcUnit.has(id)) srcUnit.set(id, byId.get(id)); });
+    });
+    const resById = new Map(((result && result.entities) || []).map(e => [e.i, e]));
+    const resUnits = new Set(this.unitIdsOf(result));
+    const aliasTo = {}, consolTo = {};
+    ((result && result.entities) || []).forEach(e => (e.al || []).forEach(a => { aliasTo[a] = e.i; }));
+    ((((result || {})._merge || {}).consolidated) || []).forEach(c => (c.from || []).forEach(f => { consolTo[f] = c.into; }));
+    const rej = new Map(((((result || {})._merge || {}).rejected) || []).map(x => [x.id, x.reason || '']));
+    const rcWhy = new Map(((((result || {})._merge || {}).reclassified) || []).map(c => [c.id, c.why || '']));
+    const added = [], removed = [], renamed = [], reclassified = [], consolidated = [];
+    let contentChanged = 0, surviving = 0;
+    const cHash = (e) => this.djb2([e.en || '', e.why || '', e.ex || '', e.bl || '', (e.sy || []).join('|'), e.mk || ''].join(' '));
+    for (const [id, se] of srcUnit) {
+      if (resUnits.has(id)) {
+        surviving++;
+        const re = resById.get(id);
+        if ((re.w || '') !== (se.w || '')) renamed.push({ id, from: se.w, to: re.w });
+        const a = this.prOfEnt(se), b = this.prOfEnt(re);
+        if (a !== b) reclassified.push({ id, name: re.w, from: a, to: b, why: rcWhy.get(id) || '' });
+        if (cHash(se) !== cHash(re)) contentChanged++;
+      }
+      else if (aliasTo[id] && resUnits.has(aliasTo[id])) renamed.push({ id, into: aliasTo[id], via: 'alias', from: se.w, to: (resById.get(aliasTo[id]) || {}).w });
+      else if (consolTo[id]) consolidated.push({ id, name: se.w, into: consolTo[id], intoName: (resById.get(consolTo[id]) || {}).w });
+      else removed.push({ id, name: se.w, reason: rej.get(id) || 'rejected' }); // validator guarantees accounting
+    }
+    resUnits.forEach(id => { if (!srcUnit.has(id)) added.push({ id, name: (resById.get(id) || {}).w, pr: this.prOfEnt(resById.get(id)) }); });
+    const living = new Set(((result && result.entities) || []).map(e => e.i)); // ALL entities, not just units
+    const remap = id => living.has(id) ? id : ((aliasTo[id] && living.has(aliasTo[id])) ? aliasTo[id] : ((consolTo[id] && living.has(consolTo[id])) ? consolTo[id] : null));
+    const DEP = e => e.r === 'requires' || e.r === 'builds_on';
+    const srcDep = new Set();
+    sources.forEach(s => (((s.json && s.json.edges) || [])).forEach(e => { if (!DEP(e)) return; const a = remap(e.s), b = remap(e.t); if (a && b) srcDep.add(a + '|' + e.r + '|' + b); }));
+    const resDep = new Set();
+    (((result && result.edges) || [])).forEach(e => { if (DEP(e)) resDep.add(e.s + '|' + e.r + '|' + e.t); });
+    const depAdded = [...resDep].filter(x => !srcDep.has(x));
+    const depRemoved = [...srcDep].filter(x => !resDep.has(x));
+    return { added, removed, renamed, reclassified, consolidated, depAdded, depRemoved, contentChanged, surviving, aliasTo, consolTo, living, remap };
+  }
+  computeJourneyImpact(diff) {
+    // over the LIVE plan; classification uses EFFECTIVE priority on both sides — the preview
+    // must never promise a change the learner's override will veto (it is the evidence behind Apply)
+    const p = this.state.plan; if (!p) return null;
+    const ov = this.state.prOv || {};
+    const effOf = (id, entPr) => this.PR_LEVELS.includes(ov[id]) ? ov[id] : entPr;
+    const demoted = new Map(), overridden = [];
+    diff.reclassified.forEach(x => {
+      const effFrom = effOf(x.id, x.from), effTo = effOf(x.id, x.to);
+      if (effFrom === effTo) { overridden.push(x.id); return; } // override wins → zero movement
+      if (effTo === 'detail' || effTo === 'skip') demoted.set(x.id, x);
+    });
+    const depTouched = new Set();
+    [...diff.depAdded, ...diff.depRemoved].forEach(k2 => { const parts = k2.split('|'); depTouched.add(parts[0]); depTouched.add(parts[2]); });
+    let unchanged = 0; const rows = []; const affected = new Set();
+    const dated = p.sessions.filter(s => s.date && !s.done).sort((a, b) => a.date < b.date ? -1 : 1);
+    dated.forEach((s, k2) => {
+      const uids = s.units || [];
+      const gone = uids.filter(id => !diff.remap(id));
+      const dem = uids.filter(id => demoted.has(diff.remap(id) || id));
+      const ren = uids.filter(id => diff.remap(id) && diff.remap(id) !== id);
+      const dep = uids.filter(id => depTouched.has(diff.remap(id) || id));
+      const nm = (id) => (this.G.byId[id] || { w: id }).w;
+      const mark = (cls, txt) => { rows.push({ id: s.id, cls, txt: 'Session ' + (k2 + 1) + ' (' + this.fmtDay(s.date) + ') — ' + txt }); uids.forEach(u => affected.add(u)); };
+      if (gone.length) mark('removed', gone.map(nm).join(', ') + ' removed from the graph');
+      else if (dem.length) mark('depri', dem.map(nm).join(', ') + ' moved to optional depth');
+      else if (ren.length) mark('changed', 'topics renamed or absorbed');
+      else if (dep.length) mark('changed', 'a prerequisite changed');
+      else unchanged++;
+    });
+    const newly = diff.added.filter(a => { const eff = effOf(a.id, a.pr); return eff === 'core' || eff === 'useful'; });
+    return { unchanged, rows, newCount: newly.length, overridden,
+             concepts: affected.size, deps: diff.depAdded.length + diff.depRemoved.length, sessions: rows.length };
   }
   carryProgress(json, sourceIds, newId) {
     const consolidatedMap = {};
@@ -1843,10 +1979,10 @@ class Component extends DCLogic {
     } catch (e) {}
   }
   // ---- Merge modal handlers (mode: 'merge' | 'surgery') ----
-  mgOpen = (mode) => {
+  mgOpen = (mode, ctxHub) => {
     const sources = {};
     if (mode === 'surgery' && this.graphEntry) sources[this.graphEntry.id] = true;
-    this.setState({ merge: { mode: mode || 'merge', step: 1, sources, intent: '', paste: '', result: null, carry: true, srcJson: null }, domainOpen: false });
+    this.setState({ merge: { mode: mode || 'merge', step: 1, sources, intent: '', paste: '', result: null, carry: true, srcJson: null, ctxHub: ctxHub || null }, domainOpen: false });
   };
   mgClose = () => this.setState({ merge: null });
   mgPatch(patch) { this.setState({ merge: { ...this.state.merge, ...patch } }); }
@@ -1867,7 +2003,7 @@ class Component extends DCLogic {
     if (m.mode === 'merge' && ids.length < 2 && !m.intent.trim()) { this.showToast('Pick at least two packs — or one pack plus an expansion intent'); return; }
     if (!ids.length) { this.showToast('Pick at least one pack'); return; }
     this.mgLoadSources().then(sources => {
-      const text = this.buildMergePrompt(sources, m.intent.trim(), m.mode === 'surgery');
+      const text = this.buildMergePrompt(sources, m.intent.trim(), m.mode === 'surgery', m.ctxHub);
       const done = (ok) => { this.showToast(ok ? (text.length > 300000 ? 'Prompt copied — it is LARGE; consider fewer packs if your AI struggles' : 'Prompt copied — paste it into your AI') : 'Copy failed'); if (ok) this.mgPatch({ step: 2, srcJson: sources }); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true)).catch(() => this.copyFallback(text, done));
       else this.copyFallback(text, done);
@@ -1879,7 +2015,12 @@ class Component extends DCLogic {
     if (!json) { this.mgPatch({ result: { errors: ['No JSON found in the paste — include the whole fenced block.'], warnings: [], stats: null, json: null } }); return; }
     const finish = (sources) => {
       const v = this.validateMerge(json, sources);
-      this.mgPatch({ result: { ...v, json: v.errors.length ? null : json }, srcJson: sources });
+      const ok = !v.errors.length;
+      // the diff is the app's own account of what changed — computed from entities, never the AI's report
+      const diff = ok ? this.computeSurgeryDiff(sources, json) : null;
+      const surgActive = m.mode === 'surgery' && this.graphEntry && sources.length === 1 && sources[0].id === this.graphEntry.id;
+      const impact = ok && surgActive ? this.computeJourneyImpact(diff) : null;
+      this.mgPatch({ result: { ...v, json: ok ? json : null, diff, impact }, srcJson: sources });
     };
     if (m.srcJson) finish(m.srcJson); else this.mgLoadSources().then(finish);
   };
@@ -2679,6 +2820,16 @@ class Component extends DCLogic {
     const open = this.units().filter(u => !dueSet.has(u.i) && this.prOf(u.i) !== 'skip' && this.stepCompleted(u.i) && (this.state.states[u.i] || {}).self).map(u => u.i);
     return [...due, ...open].slice(0, cap);
   }
+  journeyDigestLines() {
+    // compact plan context for the surgery prompt: titles/dates/kinds/unit ids ONLY — never notes
+    const p = this.state.plan; if (!p) return [];
+    const dated = p.sessions.filter(s => s.date && !s.done).sort((a, b) => a.date < b.date ? -1 : 1);
+    const doneN = p.sessions.filter(s => s.done).length;
+    const L = [doneN + ' sessions done · ' + dated.length + ' upcoming'];
+    dated.slice(0, 20).forEach(s => L.push(this.fmtDay(s.date) + ' · "' + s.title + '" (' + s.kind + ') — units: ' + (s.units || []).join(', ')));
+    if (dated.length > 20) L.push('… and ' + (dated.length - 20) + ' more');
+    return L;
+  }
   buildPlanReport() {
     const p = this.state.plan; if (!p) return '';
     const label = ((this.graphEntry && this.graphEntry.label) || this.meta.id || 'STUDY PLAN').toUpperCase();
@@ -3019,7 +3170,7 @@ Additionally:
   // as content to discuss ("what would you like me to do with this?") — this cover line is
   // addressed to exactly that failure mode
   PROMPT_COVER = 'NOTE TO THE AI READING THIS: whether this text reaches you as a message or as an attached/pasted document, it IS your prompt and your complete instructions. Do not summarize it, do not describe it, do not ask what to do with it — execute it now.';
-  BUILD_TAG = 'v0810b';
+  BUILD_TAG = 'v0810c';
   setPromptStyle(v) {
     const pstyle = v === 'zoltraak' ? 'zoltraak' : 'guided';
     try { localStorage.setItem(this.KEYBASE + ':style', pstyle); } catch (e) {}
@@ -4956,6 +5107,7 @@ Separate search from justification. Internally search broadly; then forget the s
       mgIntent: mg ? mg.intent : '',
       mgIntentChange: (e) => this.mgPatch({ intent: e.target.value }),
       mgSizeWarnOn: mgEstSize > 300000,
+      mgSizeWarnText: mgSurgery ? 'This pack is large — your AI may not manage to return it complete. Consider scoping the surgery to one cluster.' : 'These packs are large — for better results, merge two at a time.',
       mgCopyLabel: mgSurgery ? 'Copy Surgery Prompt' : 'Copy Merge Prompt',
       mgCopyGo: this.mgCopyPrompt,
       mgToStep2Go: () => this.mgPatch({ step: 2 }),
@@ -4970,14 +5122,52 @@ Separate search from justification. Internally search broadly; then forget the s
       mgOkOn: !!(mgR && mgR.json),
       mgPreviewTitle: mgR && mgR.stats ? mgR.stats.title + ' — ' + mgR.stats.hubs + ' clusters · ' + mgR.stats.units + ' topics' : '',
       mgHeadline: mgR && mgR.json && mg.srcJson ? this.mergeHeadline(mgR.json, mg.srcJson) : '',
+      mgInterp: (mgR && mgR.json && mgR.json._merge && mgR.json._merge.interpretation) || '',
+      mgWarnOn: !!(mgR && mgR.warnings && mgR.warnings.length),
+      mgWarnings: mgR && mgR.warnings ? mgR.warnings.map(t => ({ t })) : [],
+      ...(() => {
+        const d = mgR && mgR.diff;
+        if (!d) return { mgDiffOn: false, mgDiffRows: [], mgImpactOn: false, mgImpactHead: '', mgImpactRows: [] };
+        const rows = [];
+        // the content row is the whole-pack-rewrite detector: uncapped, first, neutral wording
+        if (d.contentChanged) rows.push({ icon: '≡', c: '#F0B454', t: d.contentChanged + ' of ' + d.surviving + ' surviving units had teaching content changed' });
+        const rest = [];
+        d.added.forEach(x => rest.push({ icon: '+', c: '#7FDCB8', t: (x.name || x.id) + ' added' + (x.pr === 'detail' || x.pr === 'skip' ? ' (' + x.pr + ')' : '') }));
+        d.renamed.forEach(x => rest.push({ icon: '~', c: '#F0B454', t: (x.from || x.id) + ' → ' + (x.to || x.into) + (x.via === 'alias' ? ' (absorbed)' : ' (renamed)') }));
+        d.reclassified.forEach(x => rest.push({ icon: '~', c: '#F0B454', t: (x.name || x.id) + ' ' + x.from.toUpperCase() + ' → ' + x.to.toUpperCase() + (x.why ? ' — ' + x.why : '') }));
+        d.consolidated.forEach(x => rest.push({ icon: '−', c: '#E4706F', t: (x.name || x.id) + ' consolidated into ' + (x.intoName || x.into) }));
+        d.removed.forEach(x => rest.push({ icon: '−', c: '#E4706F', t: (x.name || x.id) + ' removed — ' + x.reason }));
+        if (d.depAdded.length) rest.push({ icon: '+', c: '#7FDCB8', t: d.depAdded.length + ' dependency edge' + (d.depAdded.length === 1 ? '' : 's') + ' added' });
+        if (d.depRemoved.length) rest.push({ icon: '−', c: '#E4706F', t: d.depRemoved.length + ' dependency edge' + (d.depRemoved.length === 1 ? '' : 's') + ' removed' });
+        if (rest.length > 14) { const extra = rest.length - 14; rest.length = 14; rest.push({ icon: '·', c: '#565E82', t: '+ ' + extra + ' more changes' }); }
+        rows.push(...rest);
+        const imp = mgR.impact;
+        const impactRows = [];
+        if (imp) {
+          impactRows.push({ icon: '✓', c: '#7FDCB8', t: imp.unchanged + ' session' + (imp.unchanged === 1 ? '' : 's') + ' unchanged' });
+          imp.rows.forEach(r2 => impactRows.push({ icon: '⚠', c: r2.cls === 'removed' ? '#E4706F' : '#F0B454', t: r2.txt }));
+          if (imp.newCount) impactRows.push({ icon: '+', c: '#7FDCB8', t: imp.newCount + ' new topic' + (imp.newCount === 1 ? '' : 's') + ' available for your Journey' });
+          if (imp.overridden.length) impactRows.push({ icon: '·', c: '#8A92B8', t: imp.overridden.length + ' reclassified topic' + (imp.overridden.length === 1 ? '' : 's') + ' keep your override — Journey unchanged for these' });
+        }
+        const withIconS = (r2) => ({ ...r2, iconS: { color: r2.c, width: 14, flexShrink: 0, textAlign: 'center', fontWeight: 700 } });
+        return {
+          mgDiffOn: rows.length > 0, mgDiffRows: rows.map(withIconS),
+          mgImpactOn: !!imp,
+          mgImpactHead: imp ? 'LEARNING IMPACT · ' + imp.concepts + ' concepts · ' + imp.deps + ' dependencies · ' + imp.sessions + ' session' + (imp.sessions === 1 ? '' : 's') + ' affected' : '',
+          mgImpactRows: impactRows.map(withIconS)
+        };
+      })(),
       mgReportLines: mgR && mgR.json ? this.mergeReportLines(mgR.json).slice(0, 12).map(t => ({ t })) : [],
       mgCarryGo: () => this.mgPatch({ carry: !mg.carry }),
       mgCarryMark: mg && mg.carry ? '☑' : '☐',
       mgCarryMarkS: { width: 18, textAlign: 'center', color: mg && mg.carry ? '#7FDCB8' : '#565E82', fontSize: 13 },
-      mgImportGo: () => this.mgImport(false),
-      mgImportLabel: mgSurgery ? 'Import as new pack' : 'Import merged pack',
+      // surgery on a custom pack: Apply (replace in place) is primary, import-as-new is the escape hatch
       mgReplaceOn: !!(mgSurgery && this.graphEntry && this.graphEntry.custom),
-      mgReplaceGo: () => this.mgImport(true)
+      mgImportGo: (mgSurgery && this.graphEntry && this.graphEntry.custom) ? () => this.mgImport(true) : () => this.mgImport(false),
+      mgImportLabel: (mgSurgery && this.graphEntry && this.graphEntry.custom) ? 'Apply changes' : (mgSurgery ? 'Import as new pack' : 'Import merged pack'),
+      mgAltOn: !!(mgSurgery && this.graphEntry && this.graphEntry.custom),
+      mgAltGo: () => this.mgImport(false),
+      mgAltLabel: 'import as a new pack instead'
     };
 
     // ---- Learn mode: routes panel + guided-route HUD ----
