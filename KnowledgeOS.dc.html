@@ -810,6 +810,69 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
       </div>
     </div>
   </sc-if>
+  <sc-if value="{{ mgOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:87;background:rgba(6,8,16,.72);display:flex;align-items:center;justify-content:center;padding:18px" data-screen-label="Merge packs">
+      <div style="background:#10131F;border:1px solid rgba(140,150,190,.25);border-radius:12px;max-width:600px;width:100%;max-height:84vh;display:flex;flex-direction:column;animation:rise .25s ease">
+        <div style="padding:13px 18px;border-bottom:1px solid rgba(140,150,190,.15);display:flex;align-items:center;gap:10px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8;flex:1">{{ mgTitle }}</div>
+          <div onClick="{{ mgCloseGo }}" style="cursor:pointer;color:#565E82;font-size:14px" style-hover="color:#EAEDF7">✕</div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:16px 18px;user-select:text;-webkit-user-select:text">
+          <sc-if value="{{ mgStep1 }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8">{{ mgSourcesLabel }}</div>
+            <sc-for list="{{ mgSources }}" as="ms" hint-placeholder-count="0">
+              <div onClick="{{ ms.go }}" style="{{ ms.s }}" style-hover="background:rgba(140,150,190,.06)">
+                <span style="{{ ms.markS }}">{{ ms.mark }}</span>
+                <span style="font-size:12.5px;flex:1">{{ ms.label }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#565E82">{{ ms.count }}</span>
+              </div>
+            </sc-for>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8;margin-top:14px">{{ mgIntentLabel }}</div>
+            <textarea value="{{ mgIntent }}" onChange="{{ mgIntentChange }}" spellcheck="false" placeholder="{{ mgIntentPh }}" style="width:100%;height:52px;box-sizing:border-box;margin-top:6px;background:rgba(11,14,26,.7);border:1px solid rgba(140,150,190,.22);border-radius:8px;color:#EAEDF7;font-size:12px;line-height:1.5;padding:9px;resize:vertical;outline:none"></textarea>
+            <sc-if value="{{ mgSizeWarnOn }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:10.5px;color:#F0B454;margin-top:8px">These packs are large — for better results, merge two at a time.</div>
+            </sc-if>
+            <div onClick="{{ mgCopyGo }}" style="display:inline-block;cursor:pointer;font-size:13px;font-weight:700;color:#171126;background:#F0B454;padding:9px 16px;border-radius:8px;margin-top:14px" style-hover="background:#F6CC7E">📋 {{ mgCopyLabel }}</div>
+            <div onClick="{{ mgToStep2Go }}" style="cursor:pointer;font-size:10.5px;color:#565E82;margin-top:10px" style-hover="color:#F0B454">I already have the JSON →</div>
+          </sc-if>
+          <sc-if value="{{ mgStep2 }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8">PASTE WHAT YOUR AI RETURNED</div>
+            <textarea value="{{ mgPaste }}" onChange="{{ mgPasteChange }}" spellcheck="false" placeholder="the whole reply is fine — the JSON block is found automatically" style="width:100%;height:120px;box-sizing:border-box;margin-top:7px;background:rgba(11,14,26,.7);border:1px solid rgba(140,150,190,.22);border-radius:8px;color:#EAEDF7;font-size:10.5px;font-family:'IBM Plex Mono',monospace;line-height:1.5;padding:9px;resize:vertical;outline:none"></textarea>
+            <div style="display:flex;gap:10px;margin-top:8px;align-items:center">
+              <div onClick="{{ mgValidateGo }}" style="cursor:pointer;font-size:12px;font-weight:700;color:#171126;background:#F0B454;padding:7px 14px;border-radius:7px" style-hover="background:#F6CC7E">Validate</div>
+              <div onClick="{{ mgToStep1Go }}" style="cursor:pointer;font-size:10.5px;color:#565E82" style-hover="color:#8A92B8">← back</div>
+            </div>
+            <sc-if value="{{ mgErrOn }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:#E4706F;margin-top:12px">{{ mgErrHead }}</div>
+              <sc-for list="{{ mgErrors }}" as="me" hint-placeholder-count="0">
+                <div style="font-size:11px;line-height:1.5;color:#F0A9A8;padding-left:10px;text-indent:-10px;margin-top:3px">· {{ me.t }}</div>
+              </sc-for>
+              <div onClick="{{ mgFixGo }}" style="display:inline-block;cursor:pointer;font-size:11.5px;font-weight:700;color:#171126;background:#F0B454;padding:7px 12px;border-radius:7px;margin-top:9px" style-hover="background:#F6CC7E">📋 Copy Fix Prompt</div>
+            </sc-if>
+            <sc-if value="{{ mgOkOn }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px solid rgba(127,220,184,.3);border-radius:9px;padding:10px 13px;margin-top:12px">
+                <div style="font-size:13px;font-weight:700;color:#A8DCC4">{{ mgPreviewTitle }}</div>
+                <div style="font-size:11px;color:#B9C1DE;margin-top:4px">{{ mgHeadline }}</div>
+              </div>
+              <sc-for list="{{ mgReportLines }}" as="mr" hint-placeholder-count="0">
+                <div style="font-size:10.5px;line-height:1.55;color:#7A82A8;padding-left:10px;text-indent:-10px;margin-top:3px">· {{ mr.t }}</div>
+              </sc-for>
+              <div onClick="{{ mgCarryGo }}" style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:12px">
+                <span style="{{ mgCarryMarkS }}">{{ mgCarryMark }}</span>
+                <span style="font-size:11.5px;color:#B9C1DE">Carry my progress from the source packs</span>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+                <div onClick="{{ mgImportGo }}" style="cursor:pointer;font-size:13px;font-weight:700;color:#171126;background:#F0B454;padding:9px 16px;border-radius:8px" style-hover="background:#F6CC7E">{{ mgImportLabel }}</div>
+                <sc-if value="{{ mgReplaceOn }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ mgReplaceGo }}" style="cursor:pointer;font-size:11px;color:#E4706F" style-hover="color:#F0A9A8">replace the original instead</div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
 
   <sc-if value="{{ progOn }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed;inset:0;z-index:30;background:#0B0E1A;overflow-y:auto;overflow-x:hidden;padding:66px 18px 40px" data-screen-label="Analytics">
@@ -1240,7 +1303,7 @@ class Component extends DCLogic {
     route: null, focusRel: null, cardOpen: {}, handoff: null, hoOpen: {}, hoFull: false, intentDismissed: false,
     redisc: null, discovery: null, zseen: {}, collapse: null, curricula: {}, curEdit: null,
     taskState: {}, mis: {}, profile: { items: [], sessions: 0 }, evlog: [], paste: '', evPrev: null,
-    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided', newPack: null,
+    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided', newPack: null, merge: null,
     q: '', toast: '', hint: false, hover: null, domainOpen: false, hist: [], loadErr: '', mobileSearch: false,
     legendOpen: false,
     isMobile: (typeof window !== 'undefined' ? window.innerWidth : 1200) < 720,
@@ -1424,6 +1487,7 @@ class Component extends DCLogic {
     for (const e of j.entities) {
       if (ids.has(e.i)) err('duplicate entity id "' + e.i + '"');
       ids.add(e.i);
+      if (!e.w) err('entity "' + e.i + '" has no w (display name) — the graph cannot render it');
       const kind = e.kind || 'word';
       if (!declaredKinds.has(kind)) err('entity "' + e.i + '" has undeclared kind "' + kind + '"');
       if (e.ex && e.bl && !e.ex.includes(e.bl)) err('entity "' + e.i + '": bl "' + e.bl + '" is not a substring of ex');
@@ -1574,13 +1638,43 @@ class Component extends DCLogic {
       this.loadGraph(this.manifest.find(g => g.id === id));
     });
   };
-  downloadPack(id) {
-    const j = this.readPack(id); if (!j) return;
+  activeGraphJson() {
+    if (this.graphEntry && this.graphEntry.custom) return this.readPack(this.graphEntry.id);
+    return this.graphJson || null;
+  }
+  downloadJsonFile(obj, filename) {
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([JSON.stringify(j, null, 1)], { type: 'application/json' }));
-    a.download = id + '-pack.json';
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 1)], { type: 'application/json' }));
+    a.download = filename;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+  downloadGraph = () => {
+    const j = this.activeGraphJson(); if (!j) return;
+    this.downloadJsonFile(j, ((this.graphEntry && this.graphEntry.id) || 'graph') + '-graph.json');
+    this.showToast('Graph downloaded');
+  };
+  copyGraphJson = () => {
+    const j = this.activeGraphJson(); if (!j) return;
+    const text = JSON.stringify(j, null, 1);
+    const done = (ok) => this.showToast(ok ? 'Graph JSON copied' : 'Copy failed');
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true)).catch(() => this.copyFallback(text, done));
+    else this.copyFallback(text, done);
+  };
+  importPackFile = () => {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.json,application/json';
+    inp.onchange = () => {
+      const f = inp.files && inp.files[0]; if (!f) return;
+      f.text().then(txt => {
+        this.setState({ newPack: { step: 2, subject: '', size: 'compact', paste: txt, result: null }, domainOpen: false }, () => this.npValidate());
+      }).catch(() => this.showToast('Could not read that file'));
+    };
+    inp.click();
+  };
+  downloadPack(id) {
+    const j = this.readPack(id); if (!j) return;
+    this.downloadJsonFile(j, id + '-pack.json');
   }
   removePack(id) {
     if (this._rmArm !== id) {
@@ -1603,6 +1697,210 @@ class Component extends DCLogic {
       if (active) this.loadGraph(this.manifest.find(m => !m.custom) || this.manifest[0]);
     });
   }
+  // ---- Merge & Expand / Graph Surgery: LLM-driven graph construction with total accounting ----
+  // Invariant (mechanical, enforced below): never lose source knowledge silently — every source
+  // topic must survive, be deliberately consolidated, or be explicitly rejected with a reason.
+  sourceJsonOf(id) {
+    const entry = this.manifest.find(m => m.id === id);
+    if (!entry) return Promise.resolve(null);
+    if (entry.custom) return Promise.resolve(this.readPack(id));
+    if (this.graphEntry && this.graphEntry.id === id && this.graphJson) return Promise.resolve(this.graphJson);
+    return fetch(entry.file, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null);
+  }
+  unitIdsOf(j) {
+    const UNIT_ARCH = { word: 'unit', concept: 'hub', grammar: 'context', situation: 'context', insight: 'note', culture: 'note', question: 'note' };
+    const kinds = { ...UNIT_ARCH };
+    ((j && j.kinds) || []).forEach(k => { kinds[k.k] = k.archetype || 'unit'; });
+    return ((j && j.entities) || []).filter(e => kinds[e.kind || 'word'] === 'unit').map(e => e.i);
+  }
+  // v1 digest = full pack minus layout; the LEVEL parameter is the seam where hierarchical
+  // digests (content-trimmed → skeleton) plug in for very large merges — do not assume
+  // whole graphs always fit one context
+  packDigest(j, level) {
+    const slim = { ...j, entities: (j.entities || []).map(e => { const { x, y, ...rest } = e; return rest; }) };
+    return JSON.stringify(slim);
+  }
+  buildMergePrompt(sources, intent, surgery) {
+    // sources: [{id, json}]
+    const L = [];
+    L.push(this.PROMPT_COVER);
+    L.push('');
+    if (surgery) {
+      L.push('You are a graph surgeon for learning knowledge graphs. Below is ONE complete pack from my learning app (KnowledgeOS) and an instruction. Modify the graph per the instruction and return the COMPLETE modified pack — the whole JSON, not a diff.');
+    } else {
+      L.push('You are a graph surgeon and knowledge cartographer. Below are ' + sources.length + ' complete learning-graph packs from my learning app (KnowledgeOS). Construct ONE merged pack that is richer than any source — a semantic reconciliation, not a concatenation.');
+    }
+    if (intent) { L.push(''); L.push('== MY INTENT =='); L.push(intent); }
+    L.push('');
+    L.push('== THE GOVERNING INVARIANT (mechanically enforced on import) ==');
+    L.push('Never lose source knowledge silently. Every learnable topic id from every source pack must either (a) survive as a unit in your output (same id, or absorbed into a unit that lists it in its "al" alias array), (b) be deliberately consolidated into another unit (recorded in _merge.consolidated with a why), or (c) be explicitly rejected (recorded in _merge.rejected with a reason). Anything unaccounted for is rejected by the validator.');
+    L.push('');
+    L.push('== ' + (surgery ? 'SURGERY' : 'MERGE') + ' SEMANTICS ==');
+    if (!surgery) {
+      L.push('- Detect equivalent topics across packs (same concept, different ids or names) → ONE unit keeping the richest content: best why/ex/insights, union of sy and edges; list every absorbed id in "al".');
+      L.push('- Do not preserve redundancy for its own sake: four near-duplicate flavors of one concept is a pathological graph. Consolidate deliberately and record it.');
+      L.push('- If one pack\'s path is a subpath of another\'s, absorb the smaller into the bigger and EXPAND: the extra depth becomes new units or clusters, never dropped.');
+      L.push('- Add BRIDGING units where the merged graph exposes connective gaps between clusters, and fill obvious coverage holes the union reveals. Record them in _merge.bridges / _merge.coverage_added with a why each.');
+    } else {
+      L.push('- Apply the instruction with the smallest coherent change set; keep everything else byte-faithful where possible.');
+      L.push('- If units are renamed, split, or merged, record absorbed ids in "al" and the operations in _merge.consolidated; removals require _merge.rejected entries with reasons.');
+    }
+    L.push('- Re-derive the hub set and hub "ord" (beginner-first) for the result; the requires/builds_on graph must stay acyclic.');
+    L.push('- Every unit keeps/receives: en, why, ex (with bl an exact substring of ex), sy, f. Same schema as the sources.');
+    L.push('- _meta: ' + (surgery ? 'keep the source _meta (id may stay).' : 'a NEW id slug and title for the merged pack.'));
+    L.push('');
+    L.push('== THE CHANGE REPORT (inside the JSON — your only deliverable is still one JSON block) ==');
+    L.push('Add a top-level "_merge" object:');
+    L.push('{ "source_packs": [' + sources.map(s => '"' + s.id + '"').join(', ') + '], "preserved": N, "enriched": ["id"], "consolidated": [{ "into": "id", "from": ["id"], "why": "…" }], "bridges": [{ "id": "…", "why": "…" }], "coverage_added": [{ "id": "…", "why": "…" }], "rejected": [{ "id": "…", "reason": "…" }] }');
+    L.push('');
+    sources.forEach((s, i) => {
+      L.push('== SOURCE PACK ' + (i + 1) + ' (' + s.id + ') ==');
+      L.push(this.packDigest(s.json, 'full'));
+      L.push('');
+    });
+    L.push('== SELF-CHECK BEFORE ANSWERING ==');
+    L.push('- Run the accounting: list every source topic id mentally and confirm each is alive, aliased, consolidated, or rejected.');
+    L.push('- ids unique; every edge endpoint exists; no self-loops; no requires/builds_on cycles; bl is a literal substring of ex; custom kinds/rels declared.');
+    L.push('');
+    L.push('== DELIVERABLE SCOPE ==');
+    L.push('Your ENTIRE response is ONE fenced json code block containing the complete ' + (surgery ? 'modified' : 'merged') + ' pack (with _merge inside). No commentary, no parts, no follow-ups. If it will not fit, consolidate harder — never split across messages.');
+    L.push('');
+    L.push('Begin immediately. Do not ask what I want — produce the complete JSON now.');
+    return L.join('\n');
+  }
+  validateMerge(json, sources) {
+    const v = this.validatePack(json);
+    const report = json && json._merge;
+    if (!report) v.warnings.push('no _merge change report in the pack — provenance and the audit view will be empty');
+    if (json && Array.isArray(json.entities)) {
+      const accounted = new Set();
+      json.entities.forEach(e => { accounted.add(e.i); (e.al || []).forEach(a => accounted.add(a)); });
+      (((report || {}).consolidated) || []).forEach(c => (c.from || []).forEach(f => accounted.add(f)));
+      (((report || {}).rejected) || []).forEach(r => { if (r && r.id) accounted.add(r.id); });
+      const lost = [];
+      sources.forEach(s => this.unitIdsOf(s.json).forEach(id => { if (!accounted.has(id)) lost.push(s.id + ':' + id); }));
+      if (lost.length) v.errors.push('silently lost source topics (each must survive, be consolidated, or be rejected with a reason): ' + lost.join(', '));
+      const living = new Set(json.entities.map(e => e.i));
+      json.entities.forEach(e => (e.al || []).forEach(a => { if (living.has(a)) v.warnings.push('alias "' + a + '" on "' + e.i + '" collides with a living unit id'); }));
+    }
+    return v;
+  }
+  mergeReportLines(json) {
+    const r = (json && json._merge) || {};
+    const lines = [];
+    (r.consolidated || []).forEach(c => lines.push('consolidated: ' + (c.into || '?') + ' ← ' + ((c.from || []).join(', ')) + (c.why ? ' — ' + c.why : '')));
+    (r.bridges || []).forEach(b => lines.push('bridge added: ' + (b.id || '?') + (b.why ? ' — ' + b.why : '')));
+    (r.coverage_added || []).forEach(b => lines.push('coverage added: ' + (b.id || '?') + (b.why ? ' — ' + b.why : '')));
+    (r.rejected || []).forEach(x => lines.push('rejected: ' + (x.id || '?') + ' — ' + (x.reason || 'no reason given')));
+    return lines;
+  }
+  mergeHeadline(json, sources) {
+    const r = (json && json._merge) || {};
+    const srcCount = sources.reduce((n, s) => n + this.unitIdsOf(s.json).length, 0);
+    const parts = [];
+    parts.push((r.preserved != null ? r.preserved : '?') + ' preserved');
+    if ((r.enriched || []).length) parts.push(r.enriched.length + ' enriched');
+    if ((r.consolidated || []).length) parts.push(r.consolidated.length + ' consolidated');
+    if ((r.bridges || []).length) parts.push(r.bridges.length + ' bridges added');
+    if ((r.coverage_added || []).length) parts.push(r.coverage_added.length + ' coverage gaps filled');
+    if ((r.rejected || []).length) parts.push(r.rejected.length + ' rejected');
+    return 'From ' + srcCount + ' source topics: ' + parts.join(' · ');
+  }
+  carryProgress(json, sourceIds, newId) {
+    const consolidatedMap = {};
+    (((json._merge || {}).consolidated) || []).forEach(c => (c.from || []).forEach(f => { consolidatedMap[f] = c.into; }));
+    const blobs = sourceIds.map(sid => { try { return JSON.parse(localStorage.getItem(this.KEYBASE + ':' + sid)) || {}; } catch (e) { return {}; } });
+    const best = {}, mis = {};
+    const consider = (tid, st) => { if (st && (!best[tid] || (st.m || 0) > (best[tid].m || 0))) best[tid] = st; };
+    (json.entities || []).forEach(ent => {
+      [ent.i, ...(ent.al || [])].forEach(k2 => blobs.forEach(b => {
+        consider(ent.i, b.states && b.states[k2]);
+        if (b.mis && b.mis[k2] && !mis[ent.i]) mis[ent.i] = b.mis[k2];
+      }));
+    });
+    Object.entries(consolidatedMap).forEach(([from, into]) => blobs.forEach(b => {
+      consider(into, b.states && b.states[from]);
+      if (b.mis && b.mis[from] && !mis[into]) mis[into] = b.mis[from];
+    }));
+    try {
+      localStorage.setItem(this.KEYBASE + ':' + newId, JSON.stringify({ hint: 0, noIntent: 0, states: best, hist: [], zseen: {}, curricula: {}, taskState: {}, mis, profile: { items: [], sessions: 0 }, evlog: [], plan: null }));
+    } catch (e) {}
+  }
+  // ---- Merge modal handlers (mode: 'merge' | 'surgery') ----
+  mgOpen = (mode) => {
+    const sources = {};
+    if (mode === 'surgery' && this.graphEntry) sources[this.graphEntry.id] = true;
+    this.setState({ merge: { mode: mode || 'merge', step: 1, sources, intent: '', paste: '', result: null, carry: true, srcJson: null }, domainOpen: false });
+  };
+  mgClose = () => this.setState({ merge: null });
+  mgPatch(patch) { this.setState({ merge: { ...this.state.merge, ...patch } }); }
+  mgToggleSource(id) {
+    const m = this.state.merge;
+    if (m.mode === 'surgery') return; // surgery is fixed to the active domain
+    this.mgPatch({ sources: { ...m.sources, [id]: !m.sources[id] } });
+  }
+  mgSelectedIds() { const m = this.state.merge; return Object.keys(m.sources).filter(id => m.sources[id]); }
+  mgLoadSources() {
+    const ids = this.mgSelectedIds();
+    return Promise.all(ids.map(id => this.sourceJsonOf(id).then(j => ({ id, json: j })))).then(list => list.filter(s => s.json));
+  }
+  mgCopyPrompt = () => {
+    const m = this.state.merge;
+    const ids = this.mgSelectedIds();
+    if (m.mode === 'surgery' && !m.intent.trim()) { this.showToast('Describe the change you want first'); return; }
+    if (m.mode === 'merge' && ids.length < 2 && !m.intent.trim()) { this.showToast('Pick at least two packs — or one pack plus an expansion intent'); return; }
+    if (!ids.length) { this.showToast('Pick at least one pack'); return; }
+    this.mgLoadSources().then(sources => {
+      const text = this.buildMergePrompt(sources, m.intent.trim(), m.mode === 'surgery');
+      const done = (ok) => { this.showToast(ok ? (text.length > 300000 ? 'Prompt copied — it is LARGE; consider fewer packs if your AI struggles' : 'Prompt copied — paste it into your AI') : 'Copy failed'); if (ok) this.mgPatch({ step: 2, srcJson: sources }); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true)).catch(() => this.copyFallback(text, done));
+      else this.copyFallback(text, done);
+    });
+  };
+  mgValidate = () => {
+    const m = this.state.merge;
+    const json = this.extractJson(m.paste);
+    if (!json) { this.mgPatch({ result: { errors: ['No JSON found in the paste — include the whole fenced block.'], warnings: [], stats: null, json: null } }); return; }
+    const finish = (sources) => {
+      const v = this.validateMerge(json, sources);
+      this.mgPatch({ result: { ...v, json: v.errors.length ? null : json }, srcJson: sources });
+    };
+    if (m.srcJson) finish(m.srcJson); else this.mgLoadSources().then(finish);
+  };
+  mgCopyFix = () => {
+    const m = this.state.merge;
+    const errs = (m.result && m.result.errors) || [];
+    const text = [this.PROMPT_COVER, '', 'The ' + (m.mode === 'surgery' ? 'modified' : 'merged') + ' pack failed mechanical validation. Fix ALL of these and return the corrected COMPLETE pack as ONE fenced json block, nothing else:', '', ...errs.map(e2 => '- ' + e2)].join('\n');
+    const done = (ok) => this.showToast(ok ? 'Fix prompt copied' : 'Copy failed');
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true)).catch(() => this.copyFallback(text, done));
+    else this.copyFallback(text, done);
+  };
+  mgImport = (replace) => {
+    const m = this.state.merge;
+    if (!m.result || !m.result.json) return;
+    const json = m.result.json;
+    const sourceIds = this.mgSelectedIds();
+    let id;
+    if (replace && m.mode === 'surgery') {
+      id = sourceIds[0]; // replace the (custom) original in place
+    } else {
+      id = this.slugify((json._meta && json._meta.id) || 'merged');
+      const taken = new Set(this.manifest.map(x => x.id).concat(this.packIds()));
+      if (replace !== true) { let n = 2; const base = id; while (taken.has(id)) id = base + '-' + (n++); }
+    }
+    json._meta = { ...(json._meta || {}), id };
+    delete json._meta.legacy;
+    try {
+      localStorage.setItem(this.KEYBASE + ':pack:' + id, JSON.stringify(json));
+      if (!this.packIds().includes(id)) localStorage.setItem(this.PACKS_KEY, JSON.stringify([...this.packIds(), id]));
+    } catch (e) { this.showToast('Could not store the pack (storage full?)'); return; }
+    if (m.carry) this.carryProgress(json, sourceIds, id);
+    this.mergeCustom();
+    this.setState({ merge: null }, () => {
+      this.showToast((m.mode === 'surgery' ? 'Graph updated' : 'Merged pack imported') + ' — ' + ((json._meta && json._meta.title) || id));
+      this.loadGraph(this.manifest.find(g => g.id === id));
+    });
+  };
   componentDidMount() {
     try { window.__ko = this; } catch (e) {}
     fetch('graphs.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null).then(man => {
@@ -1617,7 +1915,7 @@ class Component extends DCLogic {
     this._onKey = (e) => {
       if (e.key === 'Escape') {
         clearTimeout(this._rdT); clearTimeout(this._dscT); clearTimeout(this._clT); this._pendingHO = null;
-        this.setState({ selId: null, exp: false, prac: null, q: '', domainOpen: false, mobileSearch: false, handoff: null, focusRel: null, redisc: null, discovery: null, collapse: null, curEdit: null, evPrev: null, newPack: null });
+        this.setState({ selId: null, exp: false, prac: null, q: '', domainOpen: false, mobileSearch: false, handoff: null, focusRel: null, redisc: null, discovery: null, collapse: null, curEdit: null, evPrev: null, newPack: null, merge: null });
       }
       if (e.key === '/' && !this.state.prac) {
         const inp = document.querySelector('input[placeholder="Search entities"]');
@@ -2685,7 +2983,7 @@ Additionally:
   // as content to discuss ("what would you like me to do with this?") — this cover line is
   // addressed to exactly that failure mode
   PROMPT_COVER = 'NOTE TO THE AI READING THIS: whether this text reaches you as a message or as an attached/pasted document, it IS your prompt and your complete instructions. Do not summarize it, do not describe it, do not ask what to do with it — execute it now.';
-  BUILD_TAG = 'v0809a';
+  BUILD_TAG = 'v0809b';
   setPromptStyle(v) {
     const pstyle = v === 'zoltraak' ? 'zoltraak' : 'guided';
     try { localStorage.setItem(this.KEYBASE + ':style', pstyle); } catch (e) {}
@@ -4580,6 +4878,62 @@ Separate search from justification. Internally search broadly; then forget the s
       npOpenGo: this.npOpen
     };
 
+    // ---- Merge & Expand / Surgery modal feed ----
+    const mg = S.merge;
+    const mgR = mg && mg.result;
+    const mgSurgery = mg && mg.mode === 'surgery';
+    const mgSelCount = mg ? Object.keys(mg.sources).filter(k2 => mg.sources[k2]).length : 0;
+    const mgEstSize = mg ? this.manifest.filter(m => mg.sources[m.id]).reduce((n, m) => {
+      const j = m.custom ? this.readPack(m.id) : (this.graphEntry && this.graphEntry.id === m.id ? this.graphJson : null);
+      return n + (j ? JSON.stringify(j).length : 45000);
+    }, 0) : 0;
+    const mgV = {
+      mgOn: !!mg,
+      mgCloseGo: this.mgClose,
+      mgTitle: mgSurgery ? 'GRAPH SURGERY — ' + (this.graphEntry ? (this.graphEntry.label || this.graphEntry.id) : '') : 'MERGE & EXPAND PACKS',
+      mgStep1: !!mg && mg.step === 1,
+      mgStep2: !!mg && mg.step === 2,
+      mgSourcesLabel: mgSurgery ? 'OPERATING ON' : 'PICK THE PACKS TO MERGE (2+, or 1 + an intent)',
+      mgSources: mg ? this.manifest.filter(m => !mgSurgery || mg.sources[m.id]).map(m => {
+        const on = !!mg.sources[m.id];
+        return {
+          label: (m.label || m.id) + (m.custom ? ' · custom' : ''),
+          count: (() => { const j = m.custom ? this.readPack(m.id) : (this.graphEntry && this.graphEntry.id === m.id ? this.graphJson : null); return j ? this.unitIdsOf(j).length + ' topics' : ''; })(),
+          mark: on ? '☑' : '☐',
+          markS: { width: 18, textAlign: 'center', color: on ? '#F0B454' : '#565E82', fontSize: 13 },
+          go: () => this.mgToggleSource(m.id),
+          s: { display: 'flex', alignItems: 'center', gap: 9, padding: '7px 8px', borderRadius: 7, cursor: mgSurgery ? 'default' : 'pointer', marginTop: 3 }
+        };
+      }) : [],
+      mgIntentLabel: mgSurgery ? 'WHAT SHOULD CHANGE?' : 'INTENT (optional)',
+      mgIntentPh: mgSurgery ? 'e.g. add prerequisites for softmax · split the Flavor cluster · rename ids to English' : 'e.g. one coherent path toward X · expand where thin · keep both languages separate',
+      mgIntent: mg ? mg.intent : '',
+      mgIntentChange: (e) => this.mgPatch({ intent: e.target.value }),
+      mgSizeWarnOn: mgEstSize > 300000,
+      mgCopyLabel: mgSurgery ? 'Copy Surgery Prompt' : 'Copy Merge Prompt',
+      mgCopyGo: this.mgCopyPrompt,
+      mgToStep2Go: () => this.mgPatch({ step: 2 }),
+      mgToStep1Go: () => this.mgPatch({ step: 1 }),
+      mgPaste: mg ? mg.paste : '',
+      mgPasteChange: (e) => this.mgPatch({ paste: e.target.value }),
+      mgValidateGo: this.mgValidate,
+      mgErrOn: !!(mgR && mgR.errors && mgR.errors.length),
+      mgErrHead: mgR && mgR.errors ? mgR.errors.length + ' ISSUE' + (mgR.errors.length === 1 ? '' : 'S') + ' — FIX AND REVALIDATE' : '',
+      mgErrors: mgR && mgR.errors ? mgR.errors.map(t => ({ t })) : [],
+      mgFixGo: this.mgCopyFix,
+      mgOkOn: !!(mgR && mgR.json),
+      mgPreviewTitle: mgR && mgR.stats ? mgR.stats.title + ' — ' + mgR.stats.hubs + ' clusters · ' + mgR.stats.units + ' topics' : '',
+      mgHeadline: mgR && mgR.json && mg.srcJson ? this.mergeHeadline(mgR.json, mg.srcJson) : '',
+      mgReportLines: mgR && mgR.json ? this.mergeReportLines(mgR.json).slice(0, 12).map(t => ({ t })) : [],
+      mgCarryGo: () => this.mgPatch({ carry: !mg.carry }),
+      mgCarryMark: mg && mg.carry ? '☑' : '☐',
+      mgCarryMarkS: { width: 18, textAlign: 'center', color: mg && mg.carry ? '#7FDCB8' : '#565E82', fontSize: 13 },
+      mgImportGo: () => this.mgImport(false),
+      mgImportLabel: mgSurgery ? 'Import as new pack' : 'Import merged pack',
+      mgReplaceOn: !!(mgSurgery && this.graphEntry && this.graphEntry.custom),
+      mgReplaceGo: () => this.mgImport(true)
+    };
+
     // ---- Learn mode: routes panel + guided-route HUD ----
     const routesOn = S.view === 'galaxy' && S.mode === 'learn' && !S.route && !S.selId && !S.exp && !S.prac && !S.redisc && !S.discovery && S.ready;
     let routeRows = [];
@@ -4701,13 +5055,22 @@ Separate search from justification. Internally search broadly; then forget the s
           go: () => this.switchDomain(g),
           s: { cursor: 'pointer', padding: '8px 10px', borderRadius: 7, color: activeId === g.id ? '#F0B454' : '#EAEDF7' }
         }));
-        const actS = { cursor: 'pointer', padding: '7px 10px', borderRadius: 7, color: '#F0B454', borderTop: '1px solid rgba(140,150,190,.12)', marginTop: 3 };
+        const actS = { cursor: 'pointer', padding: '7px 10px', borderRadius: 7, color: '#F0B454' };
         const dimS = { cursor: 'pointer', padding: '7px 10px', borderRadius: 7, color: '#8A92B8' };
+        const headS = { cursor: 'default', padding: '9px 10px 1px', color: '#565E82', borderTop: '1px solid rgba(140,150,190,.12)', marginTop: 4 };
+        const close = (fn) => () => { this.setState({ domainOpen: false }); fn(); };
+        rows.push({ label: 'PACK ACTIONS', sub: '', go: () => {}, s: headS });
         rows.push({ label: '＋ NEW LEARNING PATH', sub: 'your AI builds the subject — you import it', go: this.npOpen, s: actS });
-        rows.push({ label: 'EXPORT PROGRESS', sub: 'this domain, as a JSON file', go: () => { this.setState({ domainOpen: false }); this.exportProgress(); }, s: dimS });
-        rows.push({ label: 'IMPORT PROGRESS', sub: 'restore from an exported file', go: () => { this.setState({ domainOpen: false }); this.importProgress(); }, s: dimS });
+        rows.push({ label: 'IMPORT PACK FROM FILE', sub: 'load a downloaded .json pack', go: this.importPackFile, s: dimS });
+        if (this.manifest.length > 1) rows.push({ label: '⧉ MERGE & EXPAND PACKS…', sub: 'your AI unifies overlapping paths', go: () => this.mgOpen('merge'), s: actS });
+        rows.push({ label: 'THIS DOMAIN', sub: '', go: () => {}, s: headS });
+        rows.push({ label: '✎ EDIT THIS GRAPH…', sub: 'graph surgery via your AI', go: () => this.mgOpen('surgery'), s: dimS });
+        rows.push({ label: 'DOWNLOAD GRAPH (JSON)', sub: 'the full graph, as a file', go: close(this.downloadGraph), s: dimS });
+        rows.push({ label: 'COPY GRAPH JSON', sub: 'paste it into any chat', go: close(this.copyGraphJson), s: dimS });
+        rows.push({ label: 'EXPORT PROGRESS', sub: 'this domain, as a JSON file', go: close(this.exportProgress), s: dimS });
+        rows.push({ label: 'IMPORT PROGRESS', sub: 'restore from an exported file', go: close(this.importProgress), s: dimS });
         if (this.graphEntry && this.graphEntry.custom) {
-          rows.push({ label: 'DOWNLOAD THIS PACK', sub: 'share the graph as a file', go: () => this.downloadPack(activeId), s: dimS });
+          rows.push({ label: 'DOWNLOAD THIS PACK', sub: 'share the graph as a file', go: close(() => this.downloadPack(activeId)), s: dimS });
           rows.push({ label: 'REMOVE THIS PACK…', sub: 'deletes the pack and its progress', go: () => this.removePack(activeId), s: { ...dimS, color: '#E4706F' } });
         }
         return rows;
@@ -4844,6 +5207,7 @@ Separate search from justification. Internally search broadly; then forget the s
       setupOn, setupDomain, setupDays, setupStart, setupStartChange, setupDomainGo, setupPreview, setupNote, setupGenerateGo,
       planOn, jWhere, jDelta, jDeltaS, jDeltaSub, jReplanOn, jReplanGo, jReportGo, jProgFillS, jProgTxt, jDriftOn, jRebuildGo, jDroppedOn, jDropped, jDueOn, jDueTxt, jDueGo,
       ...npV,
+      ...mgV,
       panelOn: ((!!S.selId || S.exp || !!S.prac || routesOn) && S.view === 'galaxy') || (!!S.prac && S.view === 'journey'),
       panelStyle: S.isMobile
         ? { position: 'fixed', left: 0, right: 0, bottom: 0, height: '64vh', zIndex: 40, background: '#10131F', borderTop: '1px solid rgba(140,150,190,.22)', borderRadius: '14px 14px 0 0', animation: 'rise .3s ease', display: 'flex', flexDirection: 'column', overflow: 'hidden' }
