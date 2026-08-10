@@ -626,8 +626,8 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
             </div>
             <sc-if value="{{ jDriftOn }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;align-items:center;gap:9px;border:1px solid rgba(240,140,84,.3);border-radius:8px;padding:7px 11px;margin-top:10px">
-                <span style="font-size:11px;color:#F0B454;flex:1">The curriculum changed since this plan was generated.</span>
-                <span onClick="{{ jRebuildGo }}" style="cursor:pointer;font-size:10.5px;color:#F0B454;text-decoration:underline;text-underline-offset:3px" style-hover="color:#F6CC7E">rebuild plan</span>
+                <span style="font-size:11px;color:#F0B454;flex:1">Your learning structure changed since this plan was made.</span>
+                <span onClick="{{ jRebuildGo }}" style="cursor:pointer;font-size:10.5px;color:#F0B454;text-decoration:underline;text-underline-offset:3px" style-hover="color:#F6CC7E">update plan</span>
               </div>
             </sc-if>
             <sc-if value="{{ jDroppedOn }}" hint-placeholder-val="{{ false }}">
@@ -1028,13 +1028,6 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
           </sc-if>
         </div>
         <div style="flex:1;overflow-y:auto;padding:14px 20px;user-select:text;-webkit-user-select:text">
-          <sc-if value="{{ hoNeedOn }}" hint-placeholder-val="{{ false }}">
-            <div style="padding:6px 0">
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;color:#7FDCB8;margin-bottom:8px">CURRICULUM REQUIRED</div>
-              <div style="font-size:13px;line-height:1.6;color:#D9DEF2">{{ hoNeedText }}</div>
-              <div onClick="{{ acceptAndContinue }}" style="cursor:pointer;display:inline-block;margin-top:14px;font-size:13px;font-weight:700;color:#171126;background:#F0B454;padding:10px 16px;border-radius:8px" style-hover="background:#F6CC7E">Accept engine proposal &amp; continue</div>
-            </div>
-          </sc-if>
           <sc-if value="{{ hoZOn }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:13px">
               <sc-if value="{{ hoCcOn }}" hint-placeholder-val="{{ false }}">
@@ -2898,7 +2891,7 @@ Additionally:
     if (s.kind === 'exam') {
       const base = lang
         ? 'You are a strict but fair oral examiner for ' + domain + '. This session is about what I already learned — find out whether I can actually use it, live.'
-        : 'You are a skeptical staff-level examiner on ' + domain + '. This session is about material I claim to know — find out whether I actually understand it.';
+        : 'You are a skeptical expert examiner on ' + domain + '. This session is about material I claim to know — find out whether I actually understand it.';
       return (meta.projectContext ? meta.projectContext + '\n\n' : '') + base;
     }
     if (s.kind === 'review') return 'You are my recall coach. Tonight is pure retrieval practice: you ask, I answer from memory, you verify — and we rebuild whatever cracked.';
@@ -3026,7 +3019,7 @@ Additionally:
   // as content to discuss ("what would you like me to do with this?") — this cover line is
   // addressed to exactly that failure mode
   PROMPT_COVER = 'NOTE TO THE AI READING THIS: whether this text reaches you as a message or as an attached/pasted document, it IS your prompt and your complete instructions. Do not summarize it, do not describe it, do not ask what to do with it — execute it now.';
-  BUILD_TAG = 'v0810a';
+  BUILD_TAG = 'v0810b';
   setPromptStyle(v) {
     const pstyle = v === 'zoltraak' ? 'zoltraak' : 'guided';
     try { localStorage.setItem(this.KEYBASE + ':style', pstyle); } catch (e) {}
@@ -3307,12 +3300,12 @@ For every concept, explicitly answer:
 - Is this a Zoltraak or a specialized spell?
 - Which Zoltraaks does it depend on?
 - Which future topics become dramatically easier after mastering it?
-- How often do senior practitioners actually use it?
+- How often do experienced practitioners actually use it?
 - Could an expert reconstruct this concept from first principles if they forgot the details?
 
 Whenever introducing something new, first relate it back to one or more Zoltraaks before explaining the new material. Prioritize mastery over coverage.
 
-For every Zoltraak: explain the intuition, derive it from first principles, explain why it exists, explain what problem it solved historically, expose common misconceptions, explain why beginners misunderstand it, show how experts think differently, show how it appears in real production systems, show how interviewers test it, connect it to every previously learned Zoltraak, and explain how mastering it unlocks increasingly advanced concepts.
+For every Zoltraak: explain the intuition, derive it from first principles, explain why it exists, explain what problem it solved historically, expose common misconceptions, explain why beginners misunderstand it, show how experts think differently, show how it appears in real practice, show how it gets tested under pressure, connect it to every previously learned Zoltraak, and explain how mastering it unlocks increasingly advanced concepts.
 
 Build an increasingly dense web of associations rather than isolated facts. Every new concept should strengthen multiple existing ones, and every existing concept should gain additional meaning through future topics.
 
@@ -3325,13 +3318,13 @@ Use retrieval practice, spaced repetition, interleaving, deliberate practice, an
 Frequently pause to ask:
 - "Is this becoming a Zoltraak yet?"
 - "Can you recognize this pattern immediately?"
-- "Could you derive this from first principles under interview pressure?"
+- "Could you derive this from first principles under pressure?"
 - "What retrieval schedule would make this durable?"
 - "What future topics will naturally reactivate this Zoltraak?"
 
 Refuse to move on until the previous Zoltraaks are automatic, rapidly retrievable, and usable under pressure without hints. Whenever possible, reveal recurring patterns that span engineering, mathematics, computer science, distributed systems, machine learning, and other disciplines so that I accumulate reusable mental models rather than isolated knowledge.
 
-Assume my goal is to reach the level expected of someone who designs production systems, performs at senior or staff-level technical interviews, reasons from first principles, writes production-quality software, and teaches these concepts to other experts.
+Assume my goal is to reach the level of an expert practitioner who reasons from first principles, applies these ideas fluently in real work, and can teach them to other experts.
 
 Every lesson should leave me with fewer isolated facts and more Zoltraaks. The ultimate objective is to compress an entire discipline into a small set of powerful mental models that I can instinctively recognize, retrieve, and combine to solve previously unseen problems.
 
@@ -3612,9 +3605,10 @@ Separate search from justification. Internally search broadly; then forget the s
         z.spells.forEach(s3 => L.push('- ' + s3.name + ' — ' + s3.en + (s3.dependsOn.length ? '  (builds on: ' + s3.dependsOn.join(', ') + ')' : '') + (s3.flag ? '  [frequently mistaken for a Zoltraak — a specialized spell of ' + s3.flag + ']' : '')));
       }
     } else {
-      // Teaching flavor: a pure CONSUMER of the stored Curriculum Artifact. Never recomputes the basis.
-      art = this.getCurriculum(hubId);
-      if (!art) return { needsAccept: true, hubId: hubId || null, flavor, hubName: scopeName, flavorLabel: fl.label };
+      // Teaching flavor: consumes a stored Curriculum Artifact when one exists, else an EPHEMERAL
+      // auto-draft (never persisted — persisting here would silently flip plan drift). The learner
+      // never approves a curriculum; the planner just uses the best available learning order.
+      art = this.getCurriculum(hubId) || this.buildArtifact(hubId, null, null, 'engine');
       const nmId = (id) => { const o = G.byId[id]; return (o.a ? o.a + ' ' : '') + o.w; };
       L.push(fl.role, '');
       L.push('== TOPIC ==', scopeName + (hub && hub.en ? ' — ' + hub.en : '') + '   (' + (this.meta.title || 'KnowledgeOS') + ' · ' + (this.meta.subtitle || '') + ')');
@@ -3624,8 +3618,8 @@ Separate search from justification. Internally search broadly; then forget the s
         L.push('', '== RECOMMENDED FORMAT: ' + rec.format + ' ==', rec.why);
         if (rec.signals.length) L.push('Also present in the data: ' + rec.signals.join('; ') + '.');
       }
-      L.push('', '== ACCEPTED CURRICULUM ==');
-      L.push('This curriculum has been accepted' + (art.source === 'edited' ? ' and hand-edited' : '') + '. Treat it as settled and read-only.');
+      L.push('', '== CURRICULUM ==');
+      L.push('This is the settled learning structure for this cluster' + (art.source === 'edited' ? ' (curated by the learner)' : '') + '. Treat it as settled and read-only.');
       L.push('Core concepts of ' + scopeName + ':');
       art.basis.forEach((b, k) => {
         const n2 = G.byId[b.id];
@@ -3752,12 +3746,6 @@ Separate search from justification. Internally search broadly; then forget the s
     this.setState({ discovery: null, handoff: h, hoOpen: {}, hoFull: false, zseen }, () => this.save());
   };
   hoToggle(key) { this.setState({ hoOpen: { ...this.state.hoOpen, [key]: !this.state.hoOpen[key] } }); }
-  acceptAndContinue = () => {
-    const h = this.state.handoff; if (!h || !h.needsAccept) return;
-    const art = this.buildArtifact(h.hubId, null, null, 'engine');
-    const curricula = { ...(this.state.curricula || {}), [this.curriculumKey(h.hubId)]: art };
-    this.setState({ curricula }, () => { this.save(); this.openHandoff(h.hubId, h.flavor); });
-  };
   openCurEdit(hubId) {
     const art = this.getCurriculum(hubId); if (!art) return;
     this.setState({ curEdit: { hubId: hubId || null, text: JSON.stringify({ basis: art.basis.map(b => b.id) }, null, 1) }, handoff: null });
@@ -5196,25 +5184,21 @@ Separate search from justification. Internally search broadly; then forget the s
       handoffWhy: S.handoff ? (S.handoff.why || '') : '', handoffText: S.handoff ? (S.handoff.text || '') : '',
       copyHandoff: this.copyHandoff, closeHandoff: this.closeHandoff,
       zoltraakDomain: () => this.openHandoff(null, 'zoltraak'),
-      // teaching flavor with no accepted curriculum → explicit acceptance state
-      hoNeedOn: !!(S.handoff && S.handoff.needsAccept),
-      hoReadyOn: !!(S.handoff && !S.handoff.needsAccept),
-      hoNeedText: S.handoff && S.handoff.needsAccept ? 'No accepted curriculum exists for this scope yet. Teaching flavors are pure consumers of the Curriculum Artifact — accept the engine’s proposal (or design and accept one via ZOLTRAAK) to continue.' : '',
-      acceptAndContinue: this.acceptAndContinue,
-      // Curriculum Designer modal: accept / re-accept + stored-artifact status + edit
+      hoReadyOn: !!S.handoff,
+      // Zoltraak power modal: quietly apply a decomposition to the Journey order (no ceremony, no gate)
       ...(() => {
         if (!(S.handoff && S.handoff.z)) return { hoAcceptOn: false, hoStoredOn: false, hoEditOn: false };
         const stored = this.getCurriculum(S.handoff.hubId);
-        // drift = the stored artifact's ACTUAL basis vs the current engine proposal (catches hand-edits AND graph evolution)
+        // drift = the stored ordering's ACTUAL basis vs the current engine proposal (advisory, inside this modal only)
         const drift = stored && stored.basis.map(b => b.id).join(',') !== this.engineHashFor(S.handoff.z);
         return {
           hoAcceptOn: true,
-          hoAcceptLabel: stored ? (drift ? 'RE-ACCEPT (PROPOSAL CHANGED)' : 'RE-ACCEPT CURRICULUM') : 'ACCEPT CURRICULUM',
-          hoAcceptGo: () => { this.acceptCurriculum(S.handoff.hubId, S.handoff.z); this.showToast('Curriculum accepted — teaching flavors now consume it'); },
+          hoAcceptLabel: stored ? (drift ? 'UPDATE JOURNEY ORDER (PROPOSAL CHANGED)' : 'RE-APPLY TO JOURNEY') : 'USE THIS DECOMPOSITION IN MY JOURNEY',
+          hoAcceptGo: () => { this.acceptCurriculum(S.handoff.hubId, S.handoff.z); this.showToast('Journey order updated for this cluster'); },
           hoStoredOn: true,
           hoStoredText: stored
-            ? 'STORED ARTIFACT · ' + stored.basis.length + ' CORE CONCEPTS · ' + (stored.source === 'edited' ? 'HAND-EDITED' : 'ENGINE') + (drift ? ' · DIFFERS FROM CURRENT PROPOSAL' : ' · IN SYNC')
-            : 'NO STORED CURRICULUM YET — TEACHING FLAVORS WILL ASK FOR ACCEPTANCE',
+            ? 'JOURNEY ORDER · ' + stored.basis.length + ' CORE CONCEPTS · ' + (stored.source === 'edited' ? 'CURATED' : 'ENGINE') + (drift ? ' · PROPOSAL CHANGED' : ' · IN SYNC')
+            : "THE JOURNEY CURRENTLY USES THE GRAPH'S DERIVED ORDER",
           hoEditOn: !!stored, hoEditGo: () => this.openCurEdit(S.handoff.hubId)
         };
       })(),
@@ -5223,7 +5207,7 @@ Separate search from justification. Internally search broadly; then forget the s
       curEditChange: this.curEditChange, saveCurEdit: this.saveCurEdit, cancelCurEdit: this.cancelCurEdit,
       // progressive revelation (summary view) for the zoltraak flavor
       hoZOn: !!(S.handoff && S.handoff.z) && !S.hoFull,
-      hoTextOn: !!(S.handoff && !S.handoff.needsAccept) && (!S.handoff.z || S.hoFull),
+      hoTextOn: !!S.handoff && (!S.handoff.z || S.hoFull),
       hoFullTogOn: !!(S.handoff && S.handoff.z),
       hoFullLabel: S.hoFull ? '▴ SUMMARY' : '▾ FULL PROMPT',
       hoToggleFull: () => this.setState({ hoFull: !this.state.hoFull }),
