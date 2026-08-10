@@ -408,6 +408,52 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
         </div>
       </sc-if>
 
+      <sc-if value="{{ wsOn }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%;overflow-y:auto;overflow-x:hidden;padding:16px 18px 22px" data-screen-label="Cluster workspace">
+          <div onClick="{{ wsBackGo }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#7A82A8;margin-bottom:10px" style-hover="color:#F0B454">← GALAXY</div>
+          <div style="font-size:20px;font-weight:700">{{ wsTitle }}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.12em;color:#7A82A8;margin-top:3px">{{ wsSub }}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.06em;color:#B9C1DE;margin-top:8px">{{ wsCounts }}</div>
+          <div style="display:flex;gap:8px;margin-top:13px">
+            <div onClick="{{ wsStudyGo }}" style="cursor:pointer;flex:1;text-align:center;font-size:13px;font-weight:700;color:#171126;background:#F0B454;padding:10px 14px;border-radius:8px" style-hover="background:#F6CC7E">Study</div>
+            <div onClick="{{ wsSurgeryGo }}" style="cursor:pointer;flex:1;text-align:center;font-size:13px;font-weight:600;color:#EAEDF7;background:rgba(140,150,190,.1);border:1px solid rgba(140,150,190,.28);padding:10px 14px;border-radius:8px" style-hover="border-color:rgba(240,180,84,.5);color:#F0B454">Graph surgery</div>
+          </div>
+          <div style="margin-top:14px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.16em;color:#565E82;margin-bottom:6px">AI TOOLS · UNDERSTAND &amp; TRANSFORM — THEY NEVER CHANGE THE GRAPH</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px">
+              <sc-for list="{{ wsChips }}" as="wc" hint-placeholder-count="0">
+                <div onClick="{{ wc.go }}" style="{{ wc.s }}" style-hover="color:#F0B454;border-color:rgba(240,180,84,.5)">{{ wc.label }}</div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="margin-top:14px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.16em;color:#565E82;margin-bottom:5px">MEAN RETRIEVAL ACROSS MEMBERS</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="flex:1;height:5px;border-radius:3px;background:rgba(140,150,190,.13);overflow:hidden"><div style="{{ wsMasteryFill }}"></div></div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#D9DEF2;flex-shrink:0">{{ wsMasteryPct }}%</div>
+            </div>
+          </div>
+          <sc-if value="{{ wsShelfOn }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:14px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;color:#565E82">{{ wsShelfHead }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px">
+                <sc-for list="{{ wsShelfRows }}" as="wsh" hint-placeholder-count="0">
+                  <div onClick="{{ wsh.addGo }}" style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.06em;color:#7A82A8;border:1px dashed rgba(140,150,190,.3);border-radius:6px;padding:4px 9px;white-space:nowrap" style-hover="color:#F0B454;border-color:rgba(240,180,84,.5)">{{ wsh.t }} → add</div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <div style="margin-top:14px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.16em;color:#565E82;margin-bottom:5px">MEMBERS · ROUTE ORDER</div>
+            <sc-for list="{{ wsMembers }}" as="wm" hint-placeholder-count="0">
+              <div onClick="{{ wm.go }}" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:4px 2px;font-size:12.5px;color:#D9DEF2" style-hover="color:#F0B454">
+                <span style="{{ wm.markS }}">{{ wm.mark }}</span><span>{{ wm.t }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
       <sc-if value="{{ inspOn }}" hint-placeholder-val="{{ false }}">
         <div style="height:100%;overflow-y:auto;overflow-x:hidden;padding:16px 18px 22px" data-screen-label="Inspector">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px">
@@ -716,10 +762,11 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
                     <sc-if value="{{ jr.shelfOn }}" hint-placeholder-val="{{ false }}">
                       <div style="margin-top:10px">
                         <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;color:#565E82">{{ jr.shelfHead }}</div>
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px">
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;align-items:center">
                           <sc-for list="{{ jr.shelfRows }}" as="sh" hint-placeholder-count="0">
                             <div onClick="{{ sh.addGo }}" style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.06em;color:#7A82A8;border:1px dashed rgba(140,150,190,.3);border-radius:6px;padding:4px 9px;white-space:nowrap" style-hover="color:#F0B454;border-color:rgba(240,180,84,.5)">{{ sh.t }} → add</div>
                           </sc-for>
+                          <div onClick="{{ jr.shelfClusterGo }}" style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#565E82;white-space:nowrap" style-hover="color:#F0B454">view cluster →</div>
                         </div>
                       </div>
                     </sc-if>
@@ -1345,7 +1392,7 @@ class Component extends DCLogic {
     route: null, focusRel: null, cardOpen: {}, handoff: null, hoOpen: {}, hoFull: false, intentDismissed: false,
     redisc: null, discovery: null, zseen: {}, collapse: null, curricula: {}, curEdit: null,
     taskState: {}, mis: {}, profile: { items: [], sessions: 0 }, evlog: [], paste: '', evPrev: null,
-    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided', newPack: null, merge: null, prOv: {}, tplHint: null, lastSurgery: null,
+    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided', newPack: null, merge: null, prOv: {}, tplHint: null, lastSurgery: null, ws: null,
     q: '', toast: '', hint: false, hover: null, domainOpen: false, hist: [], loadErr: '', mobileSearch: false,
     legendOpen: false,
     isMobile: (typeof window !== 'undefined' ? window.innerWidth : 1200) < 720,
@@ -2168,7 +2215,7 @@ class Component extends DCLogic {
     this._onKey = (e) => {
       if (e.key === 'Escape') {
         clearTimeout(this._rdT); clearTimeout(this._dscT); clearTimeout(this._clT); this._pendingHO = null;
-        this.setState({ selId: null, exp: false, prac: null, q: '', domainOpen: false, mobileSearch: false, handoff: null, focusRel: null, redisc: null, discovery: null, collapse: null, curEdit: null, evPrev: null, newPack: null, merge: null });
+        this.setState({ selId: null, exp: false, prac: null, q: '', domainOpen: false, mobileSearch: false, handoff: null, focusRel: null, redisc: null, discovery: null, collapse: null, curEdit: null, evPrev: null, newPack: null, merge: null, ws: this.state.selId ? this.state.ws : null });
       }
       if (e.key === '/' && !this.state.prac) {
         const inp = document.querySelector('input[placeholder="Search entities"]');
@@ -2238,7 +2285,7 @@ class Component extends DCLogic {
         selId: null, exp: false, prac: null,
         view: (viewP === 'galaxy' || viewP === 'analytics') ? viewP : (selP || modeP || routeP) ? 'galaxy' : 'journey',
         mode: 'explore', q: '', hover: null, domainOpen: false,
-        route: null, focusRel: null, cardOpen: {}, handoff: null, redisc: null, discovery: null, collapse: null, curEdit: null,
+        route: null, focusRel: null, cardOpen: {}, handoff: null, redisc: null, discovery: null, collapse: null, curEdit: null, ws: null,
         zseen: (saved && saved.zseen) || {},
         curricula: (saved && saved.curricula) || {},
         taskState: (saved && saved.taskState) || {},
@@ -2319,7 +2366,13 @@ class Component extends DCLogic {
     return v;
   }
 
-  tapNode(id) { if (this.dragMoved || this.state.prac) return; this.select(id); }
+  tapNode(id) {
+    if (this.dragMoved || this.state.prac) return;
+    const n = this.G.byId[id];
+    // canvas hub-clicks open the Cluster Workspace; everything else keeps the node card
+    if (n && this.isHub(n) && this.state.view === 'galaxy' && !this.state.route) { this.wsOpen(id); return; }
+    this.select(id);
+  }
   selHist = [];
   select(id, fromBack) {
     const n = this.G.byId[id];
@@ -2328,20 +2381,28 @@ class Component extends DCLogic {
     if (!fromBack && this.state.selId && this.state.selId !== id) { this.selHist.push(this.state.selId); if (this.selHist.length > 40) this.selHist.shift(); }
     this.setState({ selId: id, exp: false, view: 'galaxy', q: '', hover: null, hint: false, focusRel: null, cardOpen: {} }, () => { if (wasHint) this.save(); });
     if (!this.isHub(n)) { this.animateCamTo(n.x, n.y, Math.max(c.s, 1.15), true); return; }
-    if (this.isHub(n)) {
-      // frame the hub's whole constellation instead of zooming to a point
-      const mem = this.membersOf(n.i).filter(m => m.x != null);
-      if (mem.length >= 2) {
-        let minx = n.x, maxx = n.x, miny = n.y, maxy = n.y;
-        mem.forEach(m => { minx = Math.min(minx, m.x); maxx = Math.max(maxx, m.x); miny = Math.min(miny, m.y); maxy = Math.max(maxy, m.y); });
-        const vw = window.innerWidth - (this.state.isMobile ? 0 : 420), vh = window.innerHeight - (this.state.isMobile ? window.innerHeight * .5 : 130);
-        const s = Math.max(.5, Math.min(1.2, Math.min(vw / (maxx - minx + 220), vh / (maxy - miny + 220))));
-        this.animateCamTo((minx + maxx) / 2, (miny + maxy) / 2, s, true);
-        return;
-      }
-    }
+    if (this.frameHub(id)) return;
     this.animateCamTo(n.x, n.y, Math.max(c.s, .95), true);
   }
+  frameHub(hubId) {
+    // frame the hub's whole constellation instead of zooming to a point
+    const n = this.G.byId[hubId]; if (!n) return false;
+    const mem = this.membersOf(hubId).filter(m => m.x != null);
+    if (mem.length < 2) return false;
+    let minx = n.x, maxx = n.x, miny = n.y, maxy = n.y;
+    mem.forEach(m => { minx = Math.min(minx, m.x); maxx = Math.max(maxx, m.x); miny = Math.min(miny, m.y); maxy = Math.max(maxy, m.y); });
+    const vw = window.innerWidth - (this.state.isMobile ? 0 : 420), vh = window.innerHeight - (this.state.isMobile ? window.innerHeight * .5 : 130);
+    const s = Math.max(.5, Math.min(1.2, Math.min(vw / (maxx - minx + 220), vh / (maxy - miny + 220))));
+    this.animateCamTo((minx + maxx) / 2, (miny + maxy) / 2, s, true);
+    return true;
+  }
+  // ---- Cluster Workspace: where a cluster becomes usable — study it, hand it to an AI, or operate on it.
+  // The galaxy stays the map; the workspace is the room you step into.
+  wsOpen = (hubId) => {
+    if (!this.G.byId[hubId]) return;
+    this.setState({ ws: { hubId }, selId: null, exp: false, focusRel: null, hover: null, q: '', cardOpen: {} }, () => this.frameHub(hubId));
+  };
+  wsClose = () => this.setState({ ws: null, selId: null }, () => this.fitCam());
   selectBack = () => { const prev = this.selHist.pop(); if (prev && this.G.byId[prev]) this.select(prev, true); };
   closePanel = () => this.setState({ selId: null, exp: false, focusRel: null });
 
@@ -3311,7 +3372,7 @@ Additionally:
   // as content to discuss ("what would you like me to do with this?") — this cover line is
   // addressed to exactly that failure mode
   PROMPT_COVER = 'NOTE TO THE AI READING THIS: whether this text reaches you as a message or as an attached/pasted document, it IS your prompt and your complete instructions. Do not summarize it, do not describe it, do not ask what to do with it — execute it now.';
-  BUILD_TAG = 'v0810d';
+  BUILD_TAG = 'v0810e';
   setPromptStyle(v) {
     const pstyle = v === 'zoltraak' ? 'zoltraak' : 'guided';
     try { localStorage.setItem(this.KEYBASE + ':style', pstyle); } catch (e) {}
@@ -4590,6 +4651,8 @@ Separate search from justification. Internally search broadly; then forget the s
     const routeCur = rt && rt.i < rt.steps.length ? rt.steps[rt.i] : null;
     // connection focus (Level 3 of the card): chip-selected neighbors light up
     const focusSet = S.focusRel ? new Set([S.selId, ...S.focusRel.ids].filter(Boolean)) : null;
+    // cluster workspace: the focused constellation stays lit, the rest of the galaxy recedes
+    const wsSet = S.ws ? new Set([S.ws.hubId, ...this.membersOf(S.ws.hubId).map(m2 => m2.i)]) : null;
     // rediscovery test: the field re-emerging from its basis, wave by wave
     const rd = S.redisc;
     const rdSet = rd ? new Set(rd.waves.slice(0, rd.i + 1).flat()) : null;
@@ -4647,6 +4710,7 @@ Separate search from justification. Internally search broadly; then forget the s
       if (pathSet && pathSet.has(n.i)) op = Math.max(op, .92);
       if (unlockSet && unlockSet.has(n.i)) op = Math.max(op, .85);
       if (routeSet) op = onRoute ? 1 : (hub ? Math.min(op, .25) : Math.min(op, .12));
+      if (wsSet) op = wsSet.has(n.i) ? op : Math.min(op, .08);
       if (focusSet) op = focusSet.has(n.i) ? 1 : Math.min(op, .1);
       if (rdSet) op = rdSet.has(n.i) ? 1 : (hub ? .12 : .04);
       if (dsc) op = dsc.phase === 0 ? (dscScope.has(n.i) ? 1 : (hub ? .2 : .08)) : (dscBasis.has(n.i) ? 1 : (hub ? .12 : .05));
@@ -4803,6 +4867,7 @@ Separate search from justification. Internally search broadly; then forget the s
         if (this.DIRECTED[e.r]) marker = 'url(#arr)';
       } else if (dim && selSet) o = Math.min(o, .13);
       if (routeSet && !(routeSet.has(e.s) && routeSet.has(e.t))) o = Math.min(o, .06);
+      if (wsSet && !(wsSet.has(e.s) && wsSet.has(e.t))) o = Math.min(o, .05);
       if (focusSet && !(focusSet.has(e.s) && focusSet.has(e.t))) o = Math.min(o, .05);
       if (rdSet) o = isRdEdge ? Math.max(o, (e.r === 'requires' || e.r === 'builds_on') ? .8 : .25) : Math.min(o, .03);
       if (dsc) o = Math.min(o, dsc.phase === 0 ? .15 : .05);
@@ -5138,6 +5203,7 @@ Separate search from justification. Internally search broadly; then forget the s
           shelfOn: shelf.length > 0,
           shelfHead: 'OPTIONAL DEPTH · ' + shelf.length + ' TOPIC' + (shelf.length === 1 ? '' : 'S') + ' · UNSCHEDULED',
           shelfRows: shelf.map(uid => ({ t: (G.byId[uid] || { w: uid }).w, addGo: () => { this.setPr(uid, 'useful'); this.showToast('Promoted — use "update plan" to schedule it'); } })),
+          shelfClusterGo: () => this.setState({ view: 'galaxy', mode: 'explore', prac: null }, () => this.wsOpen(s.hubId)),
           note: s.note || '', noteChange: (e) => this.patchSession(s.id, { note: e.target.value }), noteFlag: s.note ? '· saved' : '',
           learnMark: s.promptCopied ? '✓' : '○', learnMarkS: { width: 18, flexShrink: 0, textAlign: 'center', fontSize: 13, color: s.promptCopied ? '#7FDCB8' : '#565E82' },
           compMark: s.done ? '✓' : '○', compMarkS: { width: 18, flexShrink: 0, textAlign: 'center', fontSize: 13, color: s.done ? '#7FDCB8' : '#565E82' },
@@ -5328,7 +5394,46 @@ Separate search from justification. Internally search broadly; then forget the s
     };
 
     // ---- Learn mode: routes panel + guided-route HUD ----
-    const routesOn = S.view === 'galaxy' && S.mode === 'learn' && !S.route && !S.selId && !S.exp && !S.prac && !S.redisc && !S.discovery && S.ready;
+    const routesOn = S.view === 'galaxy' && S.mode === 'learn' && !S.route && !S.selId && !S.exp && !S.prac && !S.redisc && !S.discovery && !S.ws && S.ready;
+    // ---- Cluster Workspace panel: where the cluster becomes usable (study · AI tools · surgery)
+    const wsOn = !!S.ws && S.view === 'galaxy' && !S.selId && !S.exp && !S.prac && !S.redisc && !S.discovery && S.ready;
+    const wsV = (() => {
+      if (!wsOn) return { wsOn: false, wsChips: [], wsShelfRows: [], wsMembers: [] };
+      const hub = this.G.byId[S.ws.hubId];
+      if (!hub) return { wsOn: false, wsChips: [], wsShelfRows: [], wsMembers: [] };
+      const mem = this.membersOf(hub.i);
+      const units = mem.filter(m2 => this.isUnit(m2));
+      const memIds = new Set(mem.map(m2 => m2.i));
+      const edgeN = this.G.edges.filter(e => memIds.has(e.s) && memIds.has(e.t)).length + mem.length;
+      const kn = units.filter(u => this.isKnown(u.i));
+      const avg = units.length ? units.reduce((s2, u) => s2 + this.ns(u.i).m, 0) / units.length : 0;
+      const chipS = { cursor: 'pointer', fontFamily: "'IBM Plex Mono', monospace", fontSize: 8.5, letterSpacing: '.08em', color: '#8A92B8', border: '1px solid rgba(140,150,190,.3)', borderRadius: 6, padding: '5px 9px', whiteSpace: 'nowrap' };
+      const shelf = mem.filter(m2 => this.isUnit(m2) && this.prOf(m2.i) === 'detail');
+      const stepIds = this.stepsForHub(hub.i);
+      const ordered = [...stepIds, ...units.map(u => u.i).filter(id => !stepIds.includes(id))].filter(id => this.G.byId[id]);
+      return {
+        wsOn: true,
+        wsTitle: hub.w,
+        wsSub: (hub.en || '').toUpperCase(),
+        wsCounts: units.length + ' ' + this.unitPlural() + ' · ' + edgeN + ' relationships · ' + kn.length + '/' + units.length + ' explored',
+        wsBackGo: this.wsClose,
+        wsStudyGo: () => this.enterRouteForHub(hub.i),
+        wsSurgeryGo: () => this.mgOpen('surgery', hub.i),
+        wsChips: Object.keys(this.HANDOFF_FLAVORS).map(f => ({ label: this.HANDOFF_FLAVORS[f].label, go: () => this.openHandoff(hub.i, f), s: chipS })),
+        wsMasteryPct: Math.round(avg * 100),
+        wsMasteryFill: { height: '100%', width: Math.round(avg * 100) + '%', background: '#F0B454', borderRadius: 3, transition: 'width .5s ease' },
+        wsShelfOn: shelf.length > 0,
+        wsShelfHead: 'OPTIONAL DEPTH · ' + shelf.length + ' TOPIC' + (shelf.length === 1 ? '' : 'S') + ' · UNSCHEDULED',
+        wsShelfRows: shelf.map(u => ({ t: u.w, addGo: () => { this.setPr(u.i, 'useful'); this.showToast('Promoted — use "update plan" in the Journey to schedule it'); } })),
+        wsMembers: ordered.map(id => {
+          const u = this.G.byId[id];
+          const st = this.ns(id).st;
+          return { t: (u.a ? u.a + ' ' : '') + u.w, mark: st === 'mastered' ? '◆' : (st !== 'unknown' ? '●' : '○'),
+                   markS: { width: 14, textAlign: 'center', flexShrink: 0, color: st === 'mastered' ? '#C08BF5' : (st !== 'unknown' ? '#7FDCB8' : '#565E82'), fontSize: 10 },
+                   go: () => this.select(id) };
+        })
+      };
+    })();
     let routeRows = [];
     if (routesOn) {
       const all = this.buildRoutes();
@@ -5597,7 +5702,8 @@ Separate search from justification. Internally search broadly; then forget the s
       planOn, jWhere, jDelta, jDeltaS, jDeltaSub, jReplanOn, jReplanGo, jReportGo, jProgFillS, jProgTxt, jDriftOn, jRebuildGo, jDroppedOn, jDropped, jDueOn, jDueTxt, jDueGo, jSurgOn, jSurgRows, jSurgKeepGo, jBandOn,
       ...npV,
       ...mgV,
-      panelOn: ((!!S.selId || S.exp || !!S.prac || routesOn) && S.view === 'galaxy') || (!!S.prac && S.view === 'journey'),
+      ...wsV,
+      panelOn: ((!!S.selId || S.exp || !!S.prac || routesOn || wsOn) && S.view === 'galaxy') || (!!S.prac && S.view === 'journey'),
       panelStyle: S.isMobile
         ? { position: 'fixed', left: 0, right: 0, bottom: 0, height: '64vh', zIndex: 40, background: '#10131F', borderTop: '1px solid rgba(140,150,190,.22)', borderRadius: '14px 14px 0 0', animation: 'rise .3s ease', display: 'flex', flexDirection: 'column', overflow: 'hidden' }
         : { position: 'fixed', top: 58, right: 12, bottom: 12, width: 380, zIndex: 40, background: '#10131F', border: '1px solid rgba(140,150,190,.22)', borderRadius: 12, animation: 'rise .3s ease', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
