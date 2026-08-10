@@ -19,7 +19,11 @@ git clone https://github.com/Ademord/knowledge-os && cd knowledge-os
 python -m http.server 4179
 ```
 
-Open `http://localhost:4179/KnowledgeOS.dc.html` — pick a domain pack (LLM engineering or German A2), set your week, watch the live preview, generate. Everything persists in your browser (localStorage); export/import lives under Explore → Analytics. Any static file server works. Dev niceties: `?graph=<id>` deep-links a pack, `?view=galaxy` opens the graph, `?autoplan=1` generates a default plan on first load (used for screenshots/tests).
+Open `http://localhost:4179/KnowledgeOS.dc.html` — pick a domain pack (LLM engineering or German A2), set your week, watch the live preview, generate. Everything persists in your browser (localStorage); to move your progress between browsers/URLs use **Explore → ANALYTICS → footer: export progress / import progress** (a JSON snapshot of everything for the domain — mastery, curricula, your plan, profile, evidence log). Any static file server works. Dev niceties: `?graph=<id>` deep-links a pack, `?view=galaxy` opens the graph, `?autoplan=1` generates a default plan on first load (used for screenshots/tests).
+
+## Status
+
+**Everything documented in this README is implemented and live** — this page describes the product as it runs today, not a roadmap. Section names like "Phase 2" and "Phase 3" below are the project's historical build-phase names, kept because [docs/PHASE2-curriculum-engine.md](docs/PHASE2-curriculum-engine.md) is the frozen *design spec* of the curriculum engine (its reasoning protocol converged over five revision rounds and is intentionally not iterated further). The actual to-be-done list is short: calendar (ICS) export, a flashcard deck, multiple named curricula per domain, and smoother node-list rendering during route reveals.
 
 ## The Journey (default surface — your study plan)
 
@@ -47,9 +51,9 @@ A single-file knowledge-graph learning engine ([KnowledgeOS.dc.html](KnowledgeOS
 
 Run: serve this folder statically (launch config `knowledge-os`, port 4179) and open `KnowledgeOS.dc.html`. Lint domain packs with `node validate.js` (edge integrity, practice-data checks, `requires`-cycle detection — exit 1 on errors).
 
-## Modes — one graph, intent-driven projections
+## Inside Explore — one graph, intent-driven projections
 
-The graph is the knowledge engine; the UI adapts to intent. Top tabs: **EXPLORE · LEARN · REVIEW · ANALYTICS**. Fresh sessions get an intent opener ("What are you trying to do today?") that routes into a mode; "don't ask again" persists.
+The graph is the knowledge engine; the UI adapts to intent. The app's top tabs are **JOURNEY · EXPLORE**; inside Explore, sub-chips project the same graph four ways: **GALAXY · ROUTES · REVIEW · ANALYTICS**.
 
 - **Explore** — the free-roam galaxy (unchanged behavior).
 - **Learn** — guided **routes** generated from the graph (never a separate page: the camera stays in the galaxy). The routes panel lists authored paths first, then one route per cluster in `ord` order, each with progress ("3/8 · CONTINUE →"). Entering a route draws a gold chain through the steps, recedes everything else, and drives a bottom HUD (step i/N, current topic, REVEAL → PRACTICE → auto-advance, SKIP, INSPECT, exit). Step order: authored `paths` → in-cluster topological sort over `requires`/`builds_on` (dependency domains) → frequency×reinforcement (language domains, frozen per session). Unmet prerequisites are named in the HUD ("needs Positional encoding first").
@@ -60,11 +64,11 @@ The graph is the knowledge engine; the UI adapts to intent. Top tabs: **EXPLORE 
 
 Three depths, composed per node kind, opaque calm panel: **Level 1** (always): headword, meaning, biggest-confusion strip, one example, primary CTA, retrieval bar. **Level 2**: collapsible folds only where content exists (WHY, CONJUGATION, NATIVE, CORPUS, INSIGHTS, GRAMMAR, CULTURE, QUESTIONS, MEMORY — the scheduler's dates). **Level 3**: relationship exploration happens *in the graph* — CONNECTIONS chips (SIMILAR 3 · MORPHOLOGY 5 …) highlight and frame those neighbors on canvas instead of rendering row lists. Cluster cards get **Start route**, Reveal top N, and a **GENERATE** row.
 
-## The Zoltraak curriculum engine (Phase 2 — frozen spec in [docs/PHASE2-curriculum-engine.md](docs/PHASE2-curriculum-engine.md))
+## The Zoltraak curriculum engine (shipped · "Phase 2" — design spec frozen in [docs/PHASE2-curriculum-engine.md](docs/PHASE2-curriculum-engine.md))
 
 The flagship GENERATE flavor. **ZOLTRAAK** (per cluster, or ⚡ whole-domain from the Learn panel) emits the full training protocol — researcher-mode reasoning preamble, MDL objective with Goodhart guard, compression-primitive definition, the five-test rubric (explanatory, not eliminatory), evidence layers ("The graph provides evidence. The heuristic proposes candidates. The rubric structures the argument. Conceptual reasoning makes the final decision."), and the adversarial review loop (alternative decomposition → falsification → Adversarial Defense → compression audit → Rediscovery Test) — followed by the **proposed Zoltraaks with per-rubric graph evidence**, a "why these and not the others" paragraph, specialized spells (with "frequently mistaken for a Zoltraak" flags derived from `optimizes`/`implemented_by` edges), learner state, and teaching order. Selection = normalized structural score (generativity dampens transitive depth), "smallest set" threshold, no numeric weights in the prompt. The modal opens as a **progressive summary** (per-Zoltraak Graph-evidence and Conceptual-reasoning expanders, heuristic-margin bar, full-prompt toggle; Copy always copies everything).
 
-## Experience layer (Phase 3)
+## Experience layer (shipped · "Phase 3")
 
 - **Alive graph**: selecting a topic draws the gold prerequisite spine upstream AND the teal unlock closure downstream. **Mastery rings** on every explored node (arc = retrieval %, full ring = mastered) make the graph your learning history.
 - **Conceptual Compression** — the product's central metric: `MASTER 14 → UNLOCK 30 · 2.1×` (Learn header, Zoltraak modal, Analytics tile; dependency domains only).
@@ -87,7 +91,7 @@ The artifact (basis with meaning/why/priority, spells with parents+relationship,
 
 - **Learning path**: selecting any unit in a dependency-graph domain computes its ordered unexplored prerequisite chain (`requires`/`builds_on`, deepest first) — shown as the first inspector group (with one-click reveal) and drawn as a gold spine on the canvas, anchored into already-known nodes. Concealed prerequisites on the path are force-revealed by name: the path *is* the curriculum.
 - **Back navigation** (← in the inspector) walks your selection history; hub click frames its whole constellation; ⌖ re-fits the visible graph; hover any node for state/retrieval tooltips.
-- **Deep links**: `?graph=<id>&sel=<entityId>` opens a domain with a node selected; `?mode=learn|review` opens a mode; `?route=<pathId|hub:<hubId>>` enters a route directly. Deep links suppress the intent opener.
+- **Deep links**: `?graph=<id>&sel=<entityId>` opens a domain with a node selected; `?mode=learn|review` opens a mode; `?route=<pathId|hub:<hubId>>` enters a route directly (all land in Explore; plain URLs land in the Journey).
 - **Review scheduler**: practicing a unit stamps a real next-review date (1/1/2/5/14 days by resulting state); the red pill counts *due* units (weak ∪ past-due), and the result screen reports the actual interval.
 - **Progress export/import**: Analytics footer — JSON snapshot per domain, importable after a browser wipe (domain-checked, unknown ids dropped).
 
