@@ -455,6 +455,16 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
               </div>
             </div>
           </sc-if>
+          <sc-if value="{{ sel.prOn }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-bottom:12px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.16em;color:#565E82;margin-bottom:6px">LEARNING PRIORITY · DOT = PACK DEFAULT</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px">
+                <sc-for list="{{ sel.prRow }}" as="pc" hint-placeholder-count="0">
+                  <div onClick="{{ pc.go }}" style="{{ pc.s }}" style-hover="border-color:rgba(240,180,84,.5)">{{ pc.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
           <sc-if value="{{ sel.barOn }}" hint-placeholder-val="{{ false }}">
             <div style="margin-bottom:6px">
               <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.16em;color:#565E82;margin-bottom:5px">{{ sel.barLabel }}</div>
@@ -694,6 +704,16 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
                     </sc-if>
                     <sc-if value="{{ jr.doneWhenOn }}" hint-placeholder-val="{{ false }}">
                       <div style="font-size:11px;line-height:1.55;color:#A8DCC4;background:rgba(127,220,184,.06);border-radius:8px;padding:7px 11px;margin-top:10px"><b>Done when:</b> {{ jr.doneWhen }}</div>
+                    </sc-if>
+                    <sc-if value="{{ jr.shelfOn }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin-top:10px">
+                        <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;color:#565E82">{{ jr.shelfHead }}</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px">
+                          <sc-for list="{{ jr.shelfRows }}" as="sh" hint-placeholder-count="0">
+                            <div onClick="{{ sh.addGo }}" style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.06em;color:#7A82A8;border:1px dashed rgba(140,150,190,.3);border-radius:6px;padding:4px 9px;white-space:nowrap" style-hover="color:#F0B454;border-color:rgba(240,180,84,.5)">{{ sh.t }} → add</div>
+                          </sc-for>
+                        </div>
+                      </div>
                     </sc-if>
                     <div style="margin-top:10px">
                       <div style="font-size:10px;color:#7A82A8">My notes — what I clicked, where I got stuck <span style="color:#5FA985">{{ jr.noteFlag }}</span></div>
@@ -1295,7 +1315,7 @@ class Component extends DCLogic {
     if (hist.length && hist[hist.length - 1].d === day) hist[hist.length - 1] = { d: day, n: explored };
     else hist.push({ d: day, n: explored });
     this.state.hist = hist;
-    try { localStorage.setItem(this.KEY, JSON.stringify({ hint: this.state.hint ? 0 : 1, noIntent: this.noIntentPref ? 1 : 0, states: this.state.states, hist, zseen: this.state.zseen || {}, curricula: this.state.curricula || {}, taskState: this.state.taskState || {}, mis: this.state.mis || {}, profile: this.state.profile || { items: [], sessions: 0 }, evlog: this.state.evlog || [], plan: this.state.plan || null })); } catch (e) {}
+    try { localStorage.setItem(this.KEY, JSON.stringify({ hint: this.state.hint ? 0 : 1, noIntent: this.noIntentPref ? 1 : 0, states: this.state.states, hist, zseen: this.state.zseen || {}, curricula: this.state.curricula || {}, taskState: this.state.taskState || {}, mis: this.state.mis || {}, profile: this.state.profile || { items: [], sessions: 0 }, evlog: this.state.evlog || [], plan: this.state.plan || null, prOv: this.state.prOv || {} })); } catch (e) {}
   }
 
   state = {
@@ -1303,7 +1323,7 @@ class Component extends DCLogic {
     route: null, focusRel: null, cardOpen: {}, handoff: null, hoOpen: {}, hoFull: false, intentDismissed: false,
     redisc: null, discovery: null, zseen: {}, collapse: null, curricula: {}, curEdit: null,
     taskState: {}, mis: {}, profile: { items: [], sessions: 0 }, evlog: [], paste: '', evPrev: null,
-    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided', newPack: null, merge: null,
+    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided', newPack: null, merge: null, prOv: {},
     q: '', toast: '', hint: false, hover: null, domainOpen: false, hist: [], loadErr: '', mobileSearch: false,
     legendOpen: false,
     isMobile: (typeof window !== 'undefined' ? window.innerWidth : 1200) < 720,
@@ -1488,6 +1508,7 @@ class Component extends DCLogic {
       if (ids.has(e.i)) err('duplicate entity id "' + e.i + '"');
       ids.add(e.i);
       if (!e.w) err('entity "' + e.i + '" has no w (display name) — the graph cannot render it');
+      if (e.pr !== undefined && !['core', 'useful', 'detail', 'skip'].includes(e.pr)) err('entity "' + e.i + '": pr must be one of core|useful|detail|skip (got "' + e.pr + '")');
       const kind = e.kind || 'word';
       if (!declaredKinds.has(kind)) err('entity "' + e.i + '" has undeclared kind "' + kind + '"');
       if (e.ex && e.bl && !e.ex.includes(e.bl)) err('entity "' + e.i + '": bl "' + e.bl + '" is not a substring of ex');
@@ -1564,7 +1585,7 @@ class Component extends DCLogic {
     L.push('  "paths":  [ { "id": "starter", "title": "First steps", "start": "hub_id", "steps": ["unit_id_1", "unit_id_2"] } ],   // optional: one authored beginner route');
     L.push('  "entities": [');
     L.push('    { "i": "hub_id", "kind": "concept", "w": "Cluster name", "en": "what this cluster is about", "ord": 1 },');
-    L.push('    { "i": "unit_id", "kind": "word_or_custom_unit_kind", "w": "Topic name", "en": "short meaning", "why": "why this exists / first principles", "ex": "a natural example sentence or scenario", "bl": "the exact substring of ex to blank in cloze practice", "sy": ["recall", "keywords"], "f": 4, "mk": "the classic confusion or trap, if any" },');
+    L.push('    { "i": "unit_id", "kind": "word_or_custom_unit_kind", "w": "Topic name", "en": "short meaning", "why": "why this exists / first principles", "ex": "a natural example sentence or scenario", "bl": "the exact substring of ex to blank in cloze practice", "sy": ["recall", "keywords"], "f": 4, "mk": "the classic confusion or trap, if any", "pr": "core" },');
     L.push('    { "i": "insight_id", "kind": "insight", "w": "Short insight name", "q": "A question that hooks it?", "body": "the insight, 2-3 sentences" }');
     L.push('  ],');
     L.push('  "edges": [ { "s": "unit_id", "t": "hub_id", "r": "expresses" }, { "s": "unit_id_2", "t": "unit_id", "r": "requires" }, { "s": "unit_a", "t": "unit_b", "r": "confused_with", "x": "one line on how they differ" }, { "s": "insight_id", "t": "unit_id", "r": "explains" } ]');
@@ -1577,6 +1598,7 @@ class Component extends DCLogic {
     L.push('- Dependencies: use requires/builds_on between units where one genuinely presupposes the other. The dependency graph MUST be acyclic. For skill subjects this is the backbone — be generous but honest.');
     L.push('- Confusions: for every pair beginners mix up, add a confused_with edge with an "x" note explaining the difference.');
     L.push('- Insights: 3-8 question-led capsules (kind "insight") wired to their units via "explains" edges.');
+    L.push('- Priority: assign pr EXPLICITLY on every unit — "core" (the backbone a learner cannot skip), "useful" (scheduled, the default), "detail" (real but optional depth — kept in the graph, not scheduled), "skip" (exists for completeness, excluded from the study path). Be deliberate: a pack where everything is core has no priorities.');
     L.push('- ' + (compact ? 'SIZE: compact — 3-5 hubs, 25-40 units total.' : 'SIZE: full — 6-9 hubs, 55-90 units total.'));
     L.push('');
     L.push('== SELF-CHECK BEFORE ANSWERING (the app validates all of this mechanically) ==');
@@ -1741,6 +1763,7 @@ class Component extends DCLogic {
       L.push('- Do not preserve redundancy for its own sake: four near-duplicate flavors of one concept is a pathological graph. Consolidate deliberately and record it.');
       L.push('- If one pack\'s path is a subpath of another\'s, absorb the smaller into the bigger and EXPAND: the extra depth becomes new units or clusters, never dropped.');
       L.push('- Add BRIDGING units where the merged graph exposes connective gaps between clusters, and fill obvious coverage holes the union reveals. Record them in _merge.bridges / _merge.coverage_added with a why each.');
+      L.push('- Preserve each unit\'s "pr" learning priority (core|useful|detail|skip; absent = useful). When sources disagree, the merged unit takes the strongest source priority (core > useful > detail > skip) unless my intent says otherwise.');
     } else {
       L.push('- Apply the instruction with the smallest coherent change set; keep everything else byte-faithful where possible.');
       L.push('- If units are renamed, split, or merged, record absorbed ids in "al" and the operations in _merge.consolidated; removals require _merge.rejected entries with reasons.');
@@ -1993,6 +2016,7 @@ class Component extends DCLogic {
         profile: (saved && saved.profile) || { items: [], sessions: 0 },
         evlog: (saved && saved.evlog) || [],
         plan: this.hydratePlan(saved && saved.plan),
+        prOv: (saved && saved.prOv) || {},
         setup: null, planFocus: null, timerOn: null,
         pstyle: (() => { try { return localStorage.getItem(this.KEYBASE + ':style') === 'zoltraak' ? 'zoltraak' : 'guided'; } catch (e) { return 'guided'; } })(),
         paste: '', evPrev: null,
@@ -2033,6 +2057,22 @@ class Component extends DCLogic {
 
   ns(id) { return this.state.states[id] || { st: 'unknown', m: 0 }; }
   isKnown(id) { const e = this.G.byId[id]; if (!e) return false; if (this.isHub(e)) return true; return this.ns(id).st !== 'unknown'; }
+  // ---- Learning priority: pack default (e.pr) + learner override (blob prOv); effective = override ?? default ?? 'useful'
+  PR_LEVELS = ['core', 'useful', 'detail', 'skip'];
+  prOf(id) {
+    const ov = (this.state.prOv || {})[id];
+    if (this.PR_LEVELS.includes(ov)) return ov;
+    const n = this.G.byId[id];
+    return (n && this.PR_LEVELS.includes(n.pr)) ? n.pr : 'useful';
+  }
+  prScheduled(id) { const p = this.prOf(id); return p === 'core' || p === 'useful'; }
+  setPr = (id, val) => {
+    const n = this.G.byId[id]; if (!n) return;
+    const def = this.PR_LEVELS.includes(n.pr) ? n.pr : 'useful';
+    const prOv = { ...(this.state.prOv || {}) };
+    if (val === def) delete prOv[id]; else prOv[id] = val;
+    this.setState({ prOv }, () => this.save());
+  };
   visMap() {
     const v = {};
     this.G.entities.forEach(e => { v[e.i] = this.isHub(e) ? 2 : (this.ns(e.i).st !== 'unknown' ? 2 : 0); });
@@ -2263,6 +2303,7 @@ class Component extends DCLogic {
   dueUnits() {
     const now = Date.now();
     return this.units().filter(n => {
+      if (this.prOf(n.i) === 'skip') return false; // skip = fully absent from the Journey, incl. review
       const s = this.ns(n.i);
       return s.st === 'weak' || (s.st !== 'unknown' && s.d && s.d < now);
     });
@@ -2275,8 +2316,10 @@ class Component extends DCLogic {
   journeyChapters() {
     return this.hubOrder().map(h => {
       const art = this.getCurriculum(h.i);
-      const ids = art ? [...art.basis.map(b => b.id), ...art.spells.map(s => s.id)] : this.stepsForHub(h.i);
-      return { hub: h, ids: ids.filter(id => this.G.byId[id]), draft: !art, edited: !!(art && art.source === 'edited') };
+      const all = art ? [...art.basis.map(b => b.id), ...art.spells.map(s => s.id)] : this.stepsForHub(h.i);
+      const alive = all.filter(id => this.G.byId[id]);
+      // priority filters MEMBERSHIP only, never order: core+useful scheduled, detail on the shelf, skip absent
+      return { hub: h, ids: alive.filter(id => this.prScheduled(id)), shelf: alive.filter(id => this.prOf(id) === 'detail'), draft: !art, edited: !!(art && art.source === 'edited') };
     }).filter(c => c.ids.length);
   }
   stepCompleted(id) {
@@ -2640,7 +2683,7 @@ class Component extends DCLogic {
     const cap = Math.max(1, Math.floor((s.durMin - this.PLANC.REVIEW_BASE) / this.PLANC.REVIEW_UNIT));
     const due = this.dueUnits().sort((a, b) => ((this.state.states[a.i] || {}).m || 0) - ((this.state.states[b.i] || {}).m || 0)).map(u => u.i);
     const dueSet = new Set(due);
-    const open = this.units().filter(u => !dueSet.has(u.i) && this.stepCompleted(u.i) && (this.state.states[u.i] || {}).self).map(u => u.i);
+    const open = this.units().filter(u => !dueSet.has(u.i) && this.prOf(u.i) !== 'skip' && this.stepCompleted(u.i) && (this.state.states[u.i] || {}).self).map(u => u.i);
     return [...due, ...open].slice(0, cap);
   }
   buildPlanReport() {
@@ -2983,7 +3026,7 @@ Additionally:
   // as content to discuss ("what would you like me to do with this?") — this cover line is
   // addressed to exactly that failure mode
   PROMPT_COVER = 'NOTE TO THE AI READING THIS: whether this text reaches you as a message or as an attached/pasted document, it IS your prompt and your complete instructions. Do not summarize it, do not describe it, do not ask what to do with it — execute it now.';
-  BUILD_TAG = 'v0809b';
+  BUILD_TAG = 'v0810a';
   setPromptStyle(v) {
     const pstyle = v === 'zoltraak' ? 'zoltraak' : 'guided';
     try { localStorage.setItem(this.KEYBASE + ':style', pstyle); } catch (e) {}
@@ -3821,7 +3864,7 @@ Separate search from justification. Internally search broadly; then forget the s
   };
 
   exportProgress = () => {
-    const data = { app: 'knowledgeos', graph: this.meta.id || (this.graphEntry && this.graphEntry.id), exported: new Date().toISOString(), hint: this.state.hint ? 0 : 1, states: this.state.states, hist: this.state.hist, curricula: this.state.curricula || {}, taskState: this.state.taskState || {}, mis: this.state.mis || {}, profile: this.state.profile || { items: [], sessions: 0 }, evlog: this.state.evlog || [], plan: this.state.plan || null };
+    const data = { app: 'knowledgeos', graph: this.meta.id || (this.graphEntry && this.graphEntry.id), exported: new Date().toISOString(), hint: this.state.hint ? 0 : 1, states: this.state.states, hist: this.state.hist, curricula: this.state.curricula || {}, taskState: this.state.taskState || {}, mis: this.state.mis || {}, profile: this.state.profile || { items: [], sessions: 0 }, evlog: this.state.evlog || [], plan: this.state.plan || null, prOv: this.state.prOv || {} };
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }));
     a.download = 'knowledgeos-' + (data.graph || 'graph') + '-progress.json';
@@ -3841,7 +3884,7 @@ Separate search from justification. Internally search broadly; then forget the s
         if (data.graph && data.graph !== gid) { this.showToast('That file is for domain "' + data.graph + '" — switch there first'); return; }
         const merged = { ...this.seedStates() };
         Object.keys(data.states).forEach(k => { if (this.G.byId[k]) merged[k] = data.states[k]; });
-        this.setState({ states: merged, hist: Array.isArray(data.hist) ? data.hist : [], hint: !data.hint, curricula: data.curricula || {}, taskState: data.taskState || {}, mis: data.mis || {}, profile: data.profile || { items: [], sessions: 0 }, evlog: data.evlog || [], plan: this.hydratePlan(data.plan) }, () => { this.save(); this.showToast('Progress imported'); });
+        this.setState({ states: merged, hist: Array.isArray(data.hist) ? data.hist : [], hint: !data.hint, curricula: data.curricula || {}, taskState: data.taskState || {}, mis: data.mis || {}, profile: data.profile || { items: [], sessions: 0 }, evlog: data.evlog || [], plan: this.hydratePlan(data.plan), prOv: (() => { const o = {}; Object.keys(data.prOv || {}).forEach(k => { if (this.G.byId[k]) o[k] = data.prOv[k]; }); return o; })() }, () => { this.save(); this.showToast('Progress imported'); });
       }).catch(() => this.showToast('Could not read that file'));
     };
     inp.click();
@@ -4085,7 +4128,7 @@ Separate search from justification. Internally search broadly; then forget the s
     const actS = (primary) => primary
       ? { cursor: 'pointer', flex: '1 1 auto', textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#171126', background: '#F0B454', padding: '10px 14px', borderRadius: 8 }
       : { cursor: 'pointer', flex: '1 1 auto', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#EAEDF7', background: 'rgba(140,150,190,.1)', border: '1px solid rgba(140,150,190,.28)', padding: '10px 14px', borderRadius: 8 };
-    const base = { hasMk: false, enOn: false, noteOn: false, noteS: { fontSize: 13.5, lineHeight: 1.55, color: '#EAEDF7' }, exOn: false, barOn: false, potOn: false, whyOn: false, confOn: false, connOn: false, genOn: false, folds: [], connChips: [], genRow: [], groups: [], actions: [], backOn: this.selHist.length > 0, back: this.selectBack };
+    const base = { hasMk: false, enOn: false, noteOn: false, noteS: { fontSize: 13.5, lineHeight: 1.55, color: '#EAEDF7' }, exOn: false, barOn: false, potOn: false, whyOn: false, confOn: false, connOn: false, genOn: false, prOn: false, folds: [], connChips: [], genRow: [], prRow: [], groups: [], actions: [], backOn: this.selHist.length > 0, back: this.selectBack };
     const chipS = { cursor: 'pointer', fontFamily: "'IBM Plex Mono', monospace", fontSize: 8.5, letterSpacing: '.08em', color: '#8A92B8', border: '1px solid rgba(140,150,190,.3)', borderRadius: 6, padding: '5px 9px', whiteSpace: 'nowrap' };
     const whyFold = (node) => node.why ? [this.mkFoldItem('why', 'Why it exists', '#F0B454', { isText: true, text: node.why })] : [];
 
@@ -4221,6 +4264,14 @@ Separate search from justification. Internally search broadly; then forget the s
     const acts = [];
     if (known) acts.push({ label: 'Practice retrieval', go: () => this.startPractice(n.i), s: actS(true) });
     else acts.push({ label: 'Explore concept', go: () => this.explore(n.i), s: actS(true) });
+    // learner override lives here: chips show effective priority; the pack default carries a dot
+    const prEff = this.prOf(n.i);
+    const prDef = this.PR_LEVELS.includes(n.pr) ? n.pr : 'useful';
+    const prRow = this.PR_LEVELS.map(lv => ({
+      label: lv.toUpperCase() + (lv === prDef ? ' ·' : ''),
+      go: () => this.setPr(n.i, lv),
+      s: lv === prEff ? { ...chipS, color: '#171126', background: '#F0B454', border: '1px solid #F0B454' } : chipS
+    }));
     const metaParts = [];
     if (n.ipa) metaParts.push('/' + n.ipa + '/');
     if (n.f) metaParts.push('FREQ ' + n.f + '/5');
@@ -4238,6 +4289,7 @@ Separate search from justification. Internally search broadly; then forget the s
       barOn: known, barLabel: 'RETRIEVAL STRENGTH', masteryPct: Math.round(ns2.m * 100),
       mFill: { height: '100%', width: Math.round(ns2.m * 100) + '%', background: '#8A92B8', borderRadius: 3, transition: 'width .5s ease' },
       folds, connOn: connChips.length > 0, connChips,
+      prOn: true, prRow,
       groups, actions: acts
     };
   }
@@ -4734,9 +4786,12 @@ Separate search from justification. Internally search broadly; then forget the s
       jDueTxt = '🔥 ' + due.length + ' due for review · ~' + Math.max(2, due.length) + ' min';
       jDueGo = this.startQuickReview;
       const pillS = { fontFamily: "'IBM Plex Mono',monospace", fontSize: 8, letterSpacing: '.08em', fontWeight: 700, color: '#171126', background: '#F0B454', padding: '3px 7px', borderRadius: 5, whiteSpace: 'nowrap' };
+      const shelfByHub = {};
+      this.journeyChapters().forEach(ch => { if (ch.shelf && ch.shelf.length) shelfByHub[ch.hub.i] = ch.shelf; });
       const rowFor = (s) => {
         const isCur = s.id === curId;
         const kindIcon = s.kind === 'exam' ? '⚔ ' : (s.kind === 'review' ? '↻ ' : '');
+        const shelf = (s.kind === 'exam' && s.hubId && shelfByHub[s.hubId]) || [];
         if (!isCur) {
           return {
             isRow: true, isBuffer: false, isCurrent: false,
@@ -4745,7 +4800,7 @@ Separate search from justification. Internally search broadly; then forget the s
             when: s.date ? this.fmtDay(s.date).replace(', ', ' ') : '—',
             name: kindIcon + s.title,
             pillOn: s.date === today && !s.done, pill: 'TONIGHT', pillS,
-            hint: this.fmtDur(s.durMin),
+            hint: this.fmtDur(s.durMin) + (shelf.length ? ' · +' + shelf.length + ' optional' : ''),
             go: () => this.setState({ planFocus: s.id, paste: '', evPrev: null }, () => this.scrollJourney()),
             rowS: { cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 9, padding: '5px 4px', fontSize: 12.5, color: s.done ? '#7A82A8' : '#B9C1DE' }
           };
@@ -4784,6 +4839,9 @@ Separate search from justification. Internally search broadly; then forget the s
           learnOn: s.learn.length > 0, learnRows: s.learn.map(l => ({ t: l })),
           todoOn: todoRows.length > 0, todoRows,
           doneWhenOn: !!s.doneWhen, doneWhen: s.doneWhen,
+          shelfOn: shelf.length > 0,
+          shelfHead: 'OPTIONAL DEPTH · ' + shelf.length + ' TOPIC' + (shelf.length === 1 ? '' : 'S') + ' · UNSCHEDULED',
+          shelfRows: shelf.map(uid => ({ t: (G.byId[uid] || { w: uid }).w, addGo: () => { this.setPr(uid, 'useful'); this.showToast('Promoted — use "update plan" to schedule it'); } })),
           note: s.note || '', noteChange: (e) => this.patchSession(s.id, { note: e.target.value }), noteFlag: s.note ? '· saved' : '',
           learnMark: s.promptCopied ? '✓' : '○', learnMarkS: { width: 18, flexShrink: 0, textAlign: 'center', fontSize: 13, color: s.promptCopied ? '#7FDCB8' : '#565E82' },
           compMark: s.done ? '✓' : '○', compMarkS: { width: 18, flexShrink: 0, textAlign: 'center', fontSize: 13, color: s.done ? '#7FDCB8' : '#565E82' },
