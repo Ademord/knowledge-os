@@ -28,6 +28,7 @@ function lint(file) {
   for (const e of j.entities) {
     if (ids.has(e.i)) err(file, `duplicate entity id "${e.i}"`);
     ids.add(e.i);
+    if (!e.w) err(file, `entity "${e.i}" has no w (display name) — the graph cannot render it`);
     const kind = e.kind || 'word';
     if (!declaredKinds.has(kind)) err(file, `entity "${e.i}" has undeclared kind "${kind}"`);
     if (e.ex && e.bl && !e.ex.includes(e.bl)) err(file, `entity "${e.i}": bl "${e.bl}" is not a substring of ex`);
