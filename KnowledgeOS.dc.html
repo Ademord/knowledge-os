@@ -624,10 +624,18 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
               <div style="flex:1;height:4px;background:rgba(140,150,190,.14);border-radius:2px;overflow:hidden"><div style="{{ jProgFillS }}"></div></div>
               <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#7A82A8;white-space:nowrap">{{ jProgTxt }}</span>
             </div>
-            <sc-if value="{{ jDriftOn }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;align-items:center;gap:9px;border:1px solid rgba(240,140,84,.3);border-radius:8px;padding:7px 11px;margin-top:10px">
-                <span style="font-size:11px;color:#F0B454;flex:1">Your learning structure changed since this plan was made.</span>
-                <span onClick="{{ jRebuildGo }}" style="cursor:pointer;font-size:10.5px;color:#F0B454;text-decoration:underline;text-underline-offset:3px" style-hover="color:#F6CC7E">update plan</span>
+            <sc-if value="{{ jBandOn }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px solid rgba(240,140,84,.3);border-radius:8px;padding:8px 11px;margin-top:10px">
+                <div style="display:flex;align-items:center;gap:9px">
+                  <span style="font-size:11px;color:#F0B454;flex:1">Your learning structure changed since this plan was made.</span>
+                  <span onClick="{{ jRebuildGo }}" style="cursor:pointer;font-size:10.5px;color:#F0B454;text-decoration:underline;text-underline-offset:3px;white-space:nowrap" style-hover="color:#F6CC7E">review &amp; update journey</span>
+                </div>
+                <sc-if value="{{ jSurgOn }}" hint-placeholder-val="{{ false }}">
+                  <sc-for list="{{ jSurgRows }}" as="js2" hint-placeholder-count="0">
+                    <div style="display:flex;gap:8px;font-size:10.5px;line-height:1.5;margin-top:4px"><span style="{{ js2.iconS }}">{{ js2.icon }}</span><span style="color:#B9C1DE;flex:1">{{ js2.t }}</span></div>
+                  </sc-for>
+                  <div onClick="{{ jSurgKeepGo }}" style="cursor:pointer;display:inline-block;font-size:10px;color:#565E82;margin-top:6px" style-hover="color:#8A92B8">keep as is — dismiss this report</div>
+                </sc-if>
               </div>
             </sc-if>
             <sc-if value="{{ jDroppedOn }}" hint-placeholder-val="{{ false }}">
@@ -1329,7 +1337,7 @@ class Component extends DCLogic {
     if (hist.length && hist[hist.length - 1].d === day) hist[hist.length - 1] = { d: day, n: explored };
     else hist.push({ d: day, n: explored });
     this.state.hist = hist;
-    try { localStorage.setItem(this.KEY, JSON.stringify({ hint: this.state.hint ? 0 : 1, noIntent: this.noIntentPref ? 1 : 0, states: this.state.states, hist, zseen: this.state.zseen || {}, curricula: this.state.curricula || {}, taskState: this.state.taskState || {}, mis: this.state.mis || {}, profile: this.state.profile || { items: [], sessions: 0 }, evlog: this.state.evlog || [], plan: this.state.plan || null, prOv: this.state.prOv || {} })); } catch (e) {}
+    try { localStorage.setItem(this.KEY, JSON.stringify({ hint: this.state.hint ? 0 : 1, noIntent: this.noIntentPref ? 1 : 0, states: this.state.states, hist, zseen: this.state.zseen || {}, curricula: this.state.curricula || {}, taskState: this.state.taskState || {}, mis: this.state.mis || {}, profile: this.state.profile || { items: [], sessions: 0 }, evlog: this.state.evlog || [], plan: this.state.plan || null, prOv: this.state.prOv || {}, tplHint: this.state.tplHint || null, lastSurgery: this.state.lastSurgery || null })); } catch (e) {}
   }
 
   state = {
@@ -1337,7 +1345,7 @@ class Component extends DCLogic {
     route: null, focusRel: null, cardOpen: {}, handoff: null, hoOpen: {}, hoFull: false, intentDismissed: false,
     redisc: null, discovery: null, zseen: {}, collapse: null, curricula: {}, curEdit: null,
     taskState: {}, mis: {}, profile: { items: [], sessions: 0 }, evlog: [], paste: '', evPrev: null,
-    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided', newPack: null, merge: null, prOv: {},
+    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided', newPack: null, merge: null, prOv: {}, tplHint: null, lastSurgery: null,
     q: '', toast: '', hint: false, hover: null, domainOpen: false, hist: [], loadErr: '', mobileSearch: false,
     legendOpen: false,
     isMobile: (typeof window !== 'undefined' ? window.innerWidth : 1200) < 720,
@@ -1974,9 +1982,59 @@ class Component extends DCLogic {
       consider(into, b.states && b.states[from]);
       if (b.mis && b.mis[from] && !mis[into]) mis[into] = b.mis[from];
     }));
+    // multi-source merge also carries: task markers, priority overrides (first source wins),
+    // the richest learning profile, and the availability template so onboarding doesn't re-ask
+    const taskState = {}, prOv = {};
+    (json.entities || []).forEach(ent => [ent.i, ...(ent.al || [])].forEach(k2 => blobs.forEach(b => {
+      if (b.taskState && b.taskState[k2] && (!taskState[ent.i] || (b.taskState[k2].completed && !taskState[ent.i].completed))) taskState[ent.i] = b.taskState[k2];
+      if (b.prOv && this.PR_LEVELS.includes(b.prOv[k2]) && !(ent.i in prOv)) prOv[ent.i] = b.prOv[k2];
+    })));
+    const profile = blobs.map(b => b.profile).filter(Boolean).sort((a, b) => (b.sessions || 0) - (a.sessions || 0))[0] || { items: [], sessions: 0 };
+    const tplHint = (blobs.map(b => b.tplHint).find(Boolean)) || (blobs.map(b => b.plan && b.plan.template).find(Boolean)) || null;
     try {
-      localStorage.setItem(this.KEYBASE + ':' + newId, JSON.stringify({ hint: 0, noIntent: 0, states: best, hist: [], zseen: {}, curricula: {}, taskState: {}, mis, profile: { items: [], sessions: 0 }, evlog: [], plan: null }));
+      localStorage.setItem(this.KEYBASE + ':' + newId, JSON.stringify({ hint: 0, noIntent: 0, states: best, hist: [], zseen: {}, curricula: {}, taskState, mis, profile, evlog: [], plan: null, prOv, tplHint }));
     } catch (e) {}
+  }
+  // ---- Reconciliation: surgery-replace MERGES into the learner's blob (alias-aware), never overwrites.
+  // Everything the learner wrote or earned survives; only ids are remapped. Rule: never lose silently.
+  reconcileBlob(old, json, diff) {
+    old = old || {};
+    const remap = diff.remap; // living ? id : alias ?? consolidated ?? null (built over ALL entities)
+    const mapKeys = (obj, better) => {
+      const out = {};
+      Object.entries(obj || {}).forEach(([k2, v]) => { const nk = remap(k2); if (!nk) return; if (!(nk in out) || (better && better(v, out[nk]))) out[nk] = v; });
+      return out;
+    };
+    const states = mapKeys(old.states, (a, b) => (a.m || 0) > (b.m || 0));
+    const taskState = mapKeys(old.taskState, (a, b) => !!a.completed && !b.completed);
+    const mis = mapKeys(old.mis);
+    const prOv = mapKeys(old.prOv);
+    // prune overrides that now equal the new pack default (delta-only invariant);
+    // never drop an override merely because its default moved
+    const defOf = {}; (json.entities || []).forEach(e => { defOf[e.i] = this.prOfEnt(e); });
+    Object.keys(prOv).forEach(k2 => { if (prOv[k2] === defOf[k2] || !this.PR_LEVELS.includes(prOv[k2])) delete prOv[k2]; });
+    let plan = old.plan || null;
+    if (plan && Array.isArray(plan.sessions)) {
+      const hubLiving = new Set((json.entities || []).map(e => e.i));
+      const sessions = plan.sessions.map(s => {
+        const seen = new Set();
+        const units = (s.units || []).map(remap).filter(id => id && !seen.has(id) && seen.add(id));
+        const todo = (s.todo || []).map(t => { if (!t.unitId) return t; const nk = remap(t.unitId); return nk ? { ...t, unitId: nk } : null; }).filter(Boolean);
+        // hubId remaps too — else week themes collapse to "Review" in the interim before reconcile
+        const hubId = s.hubId ? (hubLiving.has(s.hubId) ? s.hubId : (remap(s.hubId) || s.hubId)) : s.hubId;
+        return { ...s, units, todo, hubId };
+      });
+      plan = { ...plan, sessions }; // engineHash left STALE on purpose → drift fires → reconcile offered, never forced
+    }
+    const curricula = {};
+    Object.entries(old.curricula || {}).forEach(([k2, art]) => {
+      const nk = k2 === '__domain' ? k2 : (remap(k2) || null); if (!nk) return;
+      const basis = (art.basis || []).map(b => { const id = remap(b.id); return id ? { ...b, id } : null; }).filter(Boolean);
+      const spells = (art.spells || []).map(sp => { const id = remap(sp.id); return id ? { ...sp, id, parents: (sp.parents || []).map(remap).filter(Boolean) } : null; }).filter(Boolean);
+      if (basis.length) curricula[nk] = { ...art, basis, spells }; // emptied basis → drop; auto-draft takes over
+    });
+    return { ...old, states, taskState, mis, prOv, curricula, plan };
+    // hist, zseen, profile, evlog, hint, noIntent, tplHint, lastSurgery pass through inside ...old
   }
   // ---- Merge modal handlers (mode: 'merge' | 'surgery') ----
   mgOpen = (mode, ctxHub) => {
@@ -2037,24 +2095,62 @@ class Component extends DCLogic {
     if (!m.result || !m.result.json) return;
     const json = m.result.json;
     const sourceIds = this.mgSelectedIds();
+    const surgery = m.mode === 'surgery';
     let id;
-    if (replace && m.mode === 'surgery') {
+    if (replace && surgery) {
       id = sourceIds[0]; // replace the (custom) original in place
     } else {
       id = this.slugify((json._meta && json._meta.id) || 'merged');
       const taken = new Set(this.manifest.map(x => x.id).concat(this.packIds()));
-      if (replace !== true) { let n = 2; const base = id; while (taken.has(id)) id = base + '-' + (n++); }
+      let n = 2; const base = id; while (taken.has(id)) id = base + '-' + (n++);
     }
     json._meta = { ...(json._meta || {}), id };
     delete json._meta.legacy;
-    try {
-      localStorage.setItem(this.KEYBASE + ':pack:' + id, JSON.stringify(json));
-      if (!this.packIds().includes(id)) localStorage.setItem(this.PACKS_KEY, JSON.stringify([...this.packIds(), id]));
-    } catch (e) { this.showToast('Could not store the pack (storage full?)'); return; }
-    if (m.carry) this.carryProgress(json, sourceIds, id);
+    if (surgery) {
+      // ---- Apply is atomic or it is nothing: compute EVERYTHING before any write; abort restores the world.
+      const packKey = this.KEYBASE + ':pack:' + id, blobKey = this.KEYBASE + ':' + id;
+      const oldPack = (() => { try { return localStorage.getItem(packKey); } catch (e) { return null; } })();
+      const wasRegistered = this.packIds().includes(id);
+      let packStr, blobStr = null;
+      try {
+        // intent ledger: prior history read from the STORED pack, never from the paste —
+        // KnowledgeOS records what happened; the LLM cannot author its own history
+        const prev = (((oldPack ? JSON.parse(oldPack) : {}) || {})._meta || {}).surgeries || [];
+        json._meta.surgeries = [...prev, { at: new Date().toISOString(), intent: (m.intent || '').trim() }].slice(-6);
+        if (m.carry) {
+          const srcRaw = (() => { try { return localStorage.getItem(this.KEYBASE + ':' + sourceIds[0]); } catch (e) { return null; } })();
+          const srcBlob = srcRaw ? JSON.parse(srcRaw) : null;
+          if (srcBlob) {
+            const diff = m.result.diff || this.computeSurgeryDiff(m.srcJson || [], json);
+            const blob = this.reconcileBlob(srcBlob, json, diff);
+            const imp = m.result.impact;
+            if (imp) blob.lastSurgery = { at: new Date().toISOString(), rows: imp.rows, unchanged: imp.unchanged, newCount: imp.newCount };
+            blobStr = JSON.stringify(blob);
+          }
+        }
+        packStr = JSON.stringify(json);
+      } catch (e) { this.showToast('Surgery not applied — could not remap your progress. Nothing changed.'); return; }
+      try {
+        localStorage.setItem(packKey, packStr);
+        if (!wasRegistered) localStorage.setItem(this.PACKS_KEY, JSON.stringify([...this.packIds(), id]));
+        if (blobStr) localStorage.setItem(blobKey, blobStr);
+        else if (replace) localStorage.removeItem(blobKey); // carry unchecked on replace = deliberate fresh start
+      } catch (e) {
+        try { if (oldPack) localStorage.setItem(packKey, oldPack); else localStorage.removeItem(packKey); } catch (e2) {}
+        try { if (!wasRegistered) localStorage.setItem(this.PACKS_KEY, JSON.stringify(this.packIds().filter(x => x !== id))); } catch (e2) {}
+        this.showToast('Could not store the surgery (storage full?) — nothing changed');
+        return;
+      }
+    } else {
+      try {
+        localStorage.setItem(this.KEYBASE + ':pack:' + id, JSON.stringify(json));
+        if (!this.packIds().includes(id)) localStorage.setItem(this.PACKS_KEY, JSON.stringify([...this.packIds(), id]));
+      } catch (e) { this.showToast('Could not store the pack (storage full?)'); return; }
+      if (m.carry) this.carryProgress(json, sourceIds, id);
+    }
     this.mergeCustom();
     this.setState({ merge: null }, () => {
-      this.showToast((m.mode === 'surgery' ? 'Graph updated' : 'Merged pack imported') + ' — ' + ((json._meta && json._meta.title) || id));
+      this.showToast((surgery ? 'Surgery applied' : 'Merged pack imported') + ' — ' + ((json._meta && json._meta.title) || id));
       this.loadGraph(this.manifest.find(g => g.id === id));
     });
   };
@@ -2151,6 +2247,8 @@ class Component extends DCLogic {
         evlog: (saved && saved.evlog) || [],
         plan: this.hydratePlan(saved && saved.plan),
         prOv: (saved && saved.prOv) || {},
+        tplHint: (saved && saved.tplHint) || null,
+        lastSurgery: (saved && saved.lastSurgery) || null,
         setup: null, planFocus: null, timerOn: null,
         pstyle: (() => { try { return localStorage.getItem(this.KEYBASE + ':style') === 'zoltraak' ? 'zoltraak' : 'guided'; } catch (e) { return 'guided'; } })(),
         paste: '', evPrev: null,
@@ -2860,7 +2958,7 @@ class Component extends DCLogic {
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true)).catch(() => this.copyFallback(text, done));
     else this.copyFallback(text, done);
   };
-  replanFromHere = () => {
+  replanFromHere = (quiet) => {
     const p = this.state.plan; if (!p) return;
     const tpl = this.tplArr(p.template);
     const rw = this.reviewWeekday(tpl);
@@ -2879,7 +2977,50 @@ class Component extends DCLogic {
       out.push({ ...s, date: d });
       cursor = this.isoAdd(d, 1);
     }
-    this.setState({ plan: { ...p, sessions: out, replannedAt: new Date().toISOString() } }, () => { this.save(); this.showToast('Replanned from today'); this.scrollJourney(); });
+    this.setState({ plan: { ...p, sessions: out, replannedAt: new Date().toISOString() } }, () => { this.save(); if (quiet !== true) this.showToast('Replanned from today'); this.scrollJourney(); });
+  };
+  // ---- Review & update Journey: THE reconcile action for drift of any origin (surgery, promote/
+  // demote, curriculum apply). Rebuilds the plan from the same template + carries every per-session
+  // datum the learner produced. Runs ONLY on the learner's click — never silently.
+  journeyReconcile = () => {
+    const p = this.state.plan; if (!p) return;
+    const fresh = this.buildPlan(p.startDate, p.template);
+    if (fresh.error) { this.showToast(fresh.error); return; }
+    // unit-set identity first and HUB-AGNOSTIC (a re-slugged hub id must not orphan its sessions),
+    // then kind+hub+units, positional id last
+    const key1 = s => s.kind + '|' + (s.units || []).slice().sort().join(',');
+    const key2 = s => s.kind + '|' + (s.hubId || '') + '|' + (s.units || []).slice().sort().join(',');
+    const oldBy1 = new Map(), oldBy2 = new Map(), oldById = new Map();
+    p.sessions.forEach(s => {
+      oldById.set(s.id, s);
+      if (s.kind !== 'review') { if (!oldBy1.has(key1(s))) oldBy1.set(key1(s), s); if (!oldBy2.has(key2(s))) oldBy2.set(key2(s), s); }
+    });
+    const claimed = new Set();
+    const carry = (s) => {
+      let src = oldBy2.get(key2(s)) || oldBy1.get(key1(s));
+      if ((!src || claimed.has(src.id)) && oldById.get(s.id) && oldById.get(s.id).kind === s.kind) src = oldById.get(s.id);
+      if (!src || claimed.has(src.id)) return s;
+      claimed.add(src.id);
+      const used = new Set();
+      const todo = s.todo.map(t => {
+        const mi = (src.todo || []).findIndex((x, xi) => !used.has(xi) && x.act === t.act && x.unitId === t.unitId);
+        if (mi < 0) return t;
+        used.add(mi);
+        return { ...t, done: (src.todo || [])[mi].done };
+      });
+      return { ...s, todo, note: src.note || '', elapsedMin: src.elapsedMin || 0, promptCopied: src.promptCopied || null,
+               done: src.done || s.done, date: src.done ? src.date : s.date };
+    };
+    const sessions = fresh.sessions.map(carry);
+    // orphan retention covers SIGNAL, not just done: anything the learner touched is parked, never dropped
+    const touched = (s) => !!(s.done || s.note || (s.elapsedMin || 0) >= 1 || (s.todo || []).some(t => t.done) || s.promptCopied);
+    const orphans = p.sessions.filter(s => touched(s) && !claimed.has(s.id)).map(s => ({ ...s, date: null }));
+    const plan2 = { ...fresh, sessions: [...orphans, ...sessions], replannedAt: new Date().toISOString() };
+    this.setState({ plan: plan2, lastSurgery: null, planFocus: null }, () => {
+      this.save();
+      this.showToast('Journey updated' + (orphans.length ? ' — ' + orphans.length + ' touched session' + (orphans.length === 1 ? '' : 's') + ' kept under ALREADY COVERED' : ''));
+      this.replanFromHere(true);
+    });
   };
 
   // ---- Lesson Artifact: a compact tutor prompt for ONE step. Teaching-first, zero engine jargon. ----
@@ -3170,7 +3311,7 @@ Additionally:
   // as content to discuss ("what would you like me to do with this?") — this cover line is
   // addressed to exactly that failure mode
   PROMPT_COVER = 'NOTE TO THE AI READING THIS: whether this text reaches you as a message or as an attached/pasted document, it IS your prompt and your complete instructions. Do not summarize it, do not describe it, do not ask what to do with it — execute it now.';
-  BUILD_TAG = 'v0810c';
+  BUILD_TAG = 'v0810d';
   setPromptStyle(v) {
     const pstyle = v === 'zoltraak' ? 'zoltraak' : 'guided';
     try { localStorage.setItem(this.KEYBASE + ':style', pstyle); } catch (e) {}
@@ -4861,9 +5002,10 @@ Separate search from justification. Internally search broadly; then forget the s
     let jWhere = '', jDelta = '', jDeltaS = {}, jDeltaSub = '', jReplanOn = false, jReplanGo = null;
     let jProgFillS = {}, jProgTxt = '', jDriftOn = false, jRebuildGo = null;
     let jDroppedOn = false, jDropped = '', jDueOn = false, jDueTxt = '', jDueGo = null, jReportGo = null;
+    let jSurgOn = false, jSurgRows = [], jSurgKeepGo = null, jBandOn = false;
 
     if (setupOn) {
-      const eff = S.setup || { start: this.todayISO(), template: { ...this.DEFAULT_TEMPLATE } };
+      const eff = S.setup || { start: this.todayISO(), template: { ...(S.tplHint || this.DEFAULT_TEMPLATE) } };
       setupDomain = (this.graphEntry && this.graphEntry.label) || (this.meta.id || 'Current domain');
       const CYCLE = [0, 60, 120, 210];
       const durLabel = (v) => (v === 0 ? 'buffer' : (v >= 180 ? '3–4h' : (v >= 120 ? '2h' : '1h')));
@@ -4913,12 +5055,27 @@ Separate search from justification. Internally search broadly; then forget the s
       const behind = this.behindCount();
       jDelta = behind ? behind + ' session' + (behind === 1 ? '' : 's') + ' behind schedule' : 'on schedule';
       jDeltaS = { fontSize: 11, fontWeight: 700, color: behind ? '#F0B454' : '#7FDCB8' };
-      jDeltaSub = doneN + ' done · ' + p.sessions.filter(s => s.date && s.date <= today).length + ' scheduled by today';
+      const lastDated = p.sessions.filter(s => s.date).map(s => s.date).sort().pop();
+      jDeltaSub = doneN + ' done · ' + p.sessions.filter(s => s.date && s.date <= today).length + ' scheduled by today' + (lastDated ? ' · ends ' + this.fmtDay(lastDated) : '');
       jReplanOn = behind > 0; jReplanGo = this.replanFromHere; jReportGo = this.copyPlanReport;
       jProgFillS = { height: '100%', width: Math.round(100 * doneN / Math.max(1, total)) + '%', background: doneN === total ? '#7FDCB8' : '#F0B454', borderRadius: 2, transition: 'width .25s' };
       jProgTxt = doneN + '/' + total + ' sessions';
       jDriftOn = this.planDrift();
-      jRebuildGo = () => this.generatePlan(today, p.template);
+      jRebuildGo = this.journeyReconcile; // rebuild-with-carry; the blunt rebuild that discarded notes is gone
+      // post-surgery impact report: what the applied surgery means for THIS journey, until acted on or dismissed
+      if (S.lastSurgery) {
+        const ls = S.lastSurgery;
+        const sr = [{ icon: '✓', c: '#7FDCB8', t: ls.unchanged + ' session' + (ls.unchanged === 1 ? '' : 's') + ' unchanged' }];
+        (ls.rows || []).forEach(r2 => sr.push({ icon: '⚠', c: r2.cls === 'removed' ? '#E4706F' : '#F0B454', t: r2.txt }));
+        if (ls.newCount) sr.push({ icon: '+', c: '#7FDCB8', t: ls.newCount + ' new topic' + (ls.newCount === 1 ? '' : 's') + ' available for your Journey' });
+        const freshP = this.buildPlan(p.startDate, p.template);
+        const afterD = !freshP.error ? freshP.sessions.filter(s => s.date).map(s => s.date).sort().pop() : null;
+        if (lastDated && afterD && afterD !== lastDated) sr.push({ icon: '·', c: '#8A92B8', t: 'ends ' + this.fmtDay(lastDated) + ' → ' + this.fmtDay(afterD) + ' after the update' });
+        jSurgRows = sr.map(r2 => ({ ...r2, iconS: { color: r2.c, width: 14, flexShrink: 0, textAlign: 'center', fontWeight: 700 } }));
+        jSurgOn = true;
+        jSurgKeepGo = () => this.setState({ lastSurgery: null }, () => this.save());
+      }
+      jBandOn = jDriftOn || jSurgOn;
       jDroppedOn = (this._planDropped || 0) > 0;
       jDropped = (this._planDropped || 0) + ' topics from this plan are no longer in the graph — they were skipped.';
       jDueOn = due.length > 0 && (!cur || cur.kind !== 'review');
@@ -5437,7 +5594,7 @@ Separate search from justification. Internally search broadly; then forget the s
       reviewGo: S.mode === 'review' ? this.startReviewSession : this.showReview,
       journeyOn, jChapters, jFooter,
       setupOn, setupDomain, setupDays, setupStart, setupStartChange, setupDomainGo, setupPreview, setupNote, setupGenerateGo,
-      planOn, jWhere, jDelta, jDeltaS, jDeltaSub, jReplanOn, jReplanGo, jReportGo, jProgFillS, jProgTxt, jDriftOn, jRebuildGo, jDroppedOn, jDropped, jDueOn, jDueTxt, jDueGo,
+      planOn, jWhere, jDelta, jDeltaS, jDeltaSub, jReplanOn, jReplanGo, jReportGo, jProgFillS, jProgTxt, jDriftOn, jRebuildGo, jDroppedOn, jDropped, jDueOn, jDueTxt, jDueGo, jSurgOn, jSurgRows, jSurgKeepGo, jBandOn,
       ...npV,
       ...mgV,
       panelOn: ((!!S.selId || S.exp || !!S.prac || routesOn) && S.view === 'galaxy') || (!!S.prac && S.view === 'journey'),
