@@ -31,6 +31,7 @@ function lint(file) {
     if (!e.w) err(file, `entity "${e.i}" has no w (display name) — the graph cannot render it`);
     if (e.pr !== undefined && !['core', 'useful', 'detail', 'skip'].includes(e.pr)) err(file, `entity "${e.i}": pr must be one of core|useful|detail|skip (got "${e.pr}")`);
     const kind = e.kind || 'word';
+    if (e.w && (kinds[kind] === 'hub' || kinds[kind] === 'unit') && e.w.length > (kinds[kind] === 'hub' ? 20 : 28)) warn(file, `${kinds[kind] === 'hub' ? 'hub' : 'unit'} "${e.i}" has a long display name (${e.w.length} chars: "${e.w}") — it will overflow the GUI; target ≤ ${kinds[kind] === 'hub' ? 16 : 24}`);
     if (!declaredKinds.has(kind)) err(file, `entity "${e.i}" has undeclared kind "${kind}"`);
     if (e.ex && e.bl && !e.ex.includes(e.bl)) err(file, `entity "${e.i}": bl "${e.bl}" is not a substring of ex`);
     if (kinds[kind] === 'unit') {

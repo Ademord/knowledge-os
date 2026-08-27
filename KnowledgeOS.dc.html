@@ -970,6 +970,58 @@ div::-webkit-scrollbar-thumb{background:#2B3252;border-radius:3px}
     </div>
   </sc-if>
 
+  <sc-if value="{{ rnOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:87;background:rgba(6,8,16,.72);display:flex;align-items:center;justify-content:center;padding:18px" data-screen-label="Rename pack names">
+      <div style="background:#10131F;border:1px solid rgba(140,150,190,.25);border-radius:12px;max-width:560px;width:100%;max-height:84vh;display:flex;flex-direction:column;animation:rise .25s ease">
+        <div style="padding:13px 18px;border-bottom:1px solid rgba(140,150,190,.15);display:flex;align-items:center;gap:10px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8;flex:1">RENAME PACK NAMES — {{ rnPackTitle }}</div>
+          <div onClick="{{ rnCloseGo }}" style="cursor:pointer;color:#565E82;font-size:14px" style-hover="color:#EAEDF7">✕</div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:16px 18px;user-select:text;-webkit-user-select:text">
+          <sc-if value="{{ rnStep1 }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12px;line-height:1.6;color:#B9C1DE">Names only — ids, content and your progress are untouched. Your AI gets the current name inventory plus the GUI limits and proposes shorter display names.</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8;margin-top:13px">INTENT (optional)</div>
+            <textarea value="{{ rnIntent }}" onChange="{{ rnIntentChange }}" spellcheck="false" placeholder="e.g. shorten the cluster names · keep the German words untouched · drop the parentheticals" style="width:100%;height:48px;box-sizing:border-box;margin-top:6px;background:rgba(11,14,26,.7);border:1px solid rgba(140,150,190,.22);border-radius:8px;color:#EAEDF7;font-size:12px;line-height:1.5;padding:9px;resize:vertical;outline:none"></textarea>
+            <div onClick="{{ rnCopyGo }}" style="display:inline-block;cursor:pointer;font-size:13px;font-weight:700;color:#171126;background:#F0B454;padding:9px 16px;border-radius:8px;margin-top:14px" style-hover="background:#F6CC7E">📋 Copy Naming Prompt</div>
+            <div onClick="{{ rnToStep2Go }}" style="cursor:pointer;font-size:10.5px;color:#565E82;margin-top:10px" style-hover="color:#F0B454">I already have the JSON →</div>
+          </sc-if>
+          <sc-if value="{{ rnStep2 }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#7A82A8">PASTE WHAT YOUR AI RETURNED</div>
+            <textarea value="{{ rnPaste }}" onChange="{{ rnPasteChange }}" spellcheck="false" placeholder="the whole reply is fine — the JSON block is found automatically" style="width:100%;height:110px;box-sizing:border-box;margin-top:7px;background:rgba(11,14,26,.7);border:1px solid rgba(140,150,190,.22);border-radius:8px;color:#EAEDF7;font-size:10.5px;font-family:'IBM Plex Mono',monospace;line-height:1.5;padding:9px;resize:vertical;outline:none"></textarea>
+            <div style="display:flex;gap:10px;margin-top:8px;align-items:center">
+              <div onClick="{{ rnValidateGo }}" style="cursor:pointer;font-size:12px;font-weight:700;color:#171126;background:#F0B454;padding:7px 14px;border-radius:7px" style-hover="background:#F6CC7E">Validate</div>
+              <div onClick="{{ rnToStep1Go }}" style="cursor:pointer;font-size:10.5px;color:#565E82" style-hover="color:#8A92B8">← back</div>
+            </div>
+            <sc-if value="{{ rnErrOn }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:#E4706F;margin-top:12px">{{ rnErrHead }}</div>
+              <sc-for list="{{ rnErrors }}" as="re" hint-placeholder-count="0">
+                <div style="font-size:11px;line-height:1.5;color:#F0A9A8;padding-left:10px;text-indent:-10px;margin-top:3px">· {{ re.t }}</div>
+              </sc-for>
+              <div onClick="{{ rnFixGo }}" style="display:inline-block;cursor:pointer;font-size:11.5px;font-weight:700;color:#171126;background:#F0B454;padding:7px 12px;border-radius:7px;margin-top:9px" style-hover="background:#F6CC7E">📋 Copy Fix Prompt</div>
+            </sc-if>
+            <sc-if value="{{ rnOkOn }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px solid rgba(127,220,184,.3);border-radius:9px;padding:10px 13px;margin-top:12px">
+                <div style="font-size:13px;font-weight:700;color:#A8DCC4">{{ rnHeadline }}</div>
+              </div>
+              <sc-if value="{{ rnWarnOn }}" hint-placeholder-val="{{ false }}">
+                <sc-for list="{{ rnWarnings }}" as="rw" hint-placeholder-count="0">
+                  <div style="font-size:10.5px;line-height:1.5;color:#F0B454;padding-left:14px;text-indent:-14px;margin-top:4px">⚠ {{ rw.t }}</div>
+                </sc-for>
+              </sc-if>
+              <sc-for list="{{ rnDiffRows }}" as="rd2" hint-placeholder-count="0">
+                <div style="font-size:11px;line-height:1.55;color:#B9C1DE;padding-left:10px;text-indent:-10px;margin-top:3px">~ {{ rd2.t }}</div>
+              </sc-for>
+              <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
+                <div onClick="{{ rnApplyGo }}" style="cursor:pointer;font-size:13px;font-weight:700;color:#171126;background:#F0B454;padding:9px 16px;border-radius:8px" style-hover="background:#F6CC7E">Apply names</div>
+                <div onClick="{{ rnCloseGo }}" style="cursor:pointer;font-size:11px;color:#565E82" style-hover="color:#E4706F">Cancel</div>
+              </div>
+            </sc-if>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ progOn }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed;inset:0;z-index:30;background:#0B0E1A;overflow-y:auto;overflow-x:hidden;padding:66px 18px 40px" data-screen-label="Analytics">
       <div style="max-width:840px;margin:0 auto">
@@ -1392,7 +1444,7 @@ class Component extends DCLogic {
     route: null, focusRel: null, cardOpen: {}, handoff: null, hoOpen: {}, hoFull: false, intentDismissed: false,
     redisc: null, discovery: null, zseen: {}, collapse: null, curricula: {}, curEdit: null,
     taskState: {}, mis: {}, profile: { items: [], sessions: 0 }, evlog: [], paste: '', evPrev: null,
-    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided', newPack: null, merge: null, prOv: {}, tplHint: null, lastSurgery: null, ws: null,
+    plan: null, setup: null, planFocus: null, timerOn: null, pstyle: 'guided', newPack: null, merge: null, rename: null, prOv: {}, tplHint: null, lastSurgery: null, ws: null,
     q: '', toast: '', hint: false, hover: null, domainOpen: false, hist: [], loadErr: '', mobileSearch: false,
     legendOpen: false,
     isMobile: (typeof window !== 'undefined' ? window.innerWidth : 1200) < 720,
@@ -1530,8 +1582,10 @@ class Component extends DCLogic {
       const j = this.readPack(id);
       if (!j) return null;
       return { id, label: (j._meta && j._meta.title) || id, sub: 'Custom pack · ' + (j.entities || []).length + ' topics', custom: true };
-    }).filter(Boolean).filter(c => !this.manifest.some(m => m.id === c.id));
-    this.manifest = [...this.manifest.filter(m => !m.custom || this.packIds().includes(m.id)), ...customs];
+    }).filter(Boolean);
+    // rebuild custom entries fresh every call: labels refresh after renames/surgery,
+    // and registrations whose payload vanished drop out instead of lingering as dead switcher rows
+    this.manifest = [...this.manifest.filter(m => !m.custom), ...customs];
   }
   slugify(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 32) || 'pack'; }
   extractJson(text) {
@@ -1562,6 +1616,7 @@ class Component extends DCLogic {
     const meta = j._meta || {};
     if (!meta.id) err('_meta.id is required (a short slug like "cooking").');
     if (!meta.title) warn('_meta.title missing — the domain switcher will show the raw id.');
+    if (meta.title && meta.title.length > 30) warn('_meta.title is long (' + meta.title.length + ' chars) — it will overflow the domain switcher; target ≤ 24.');
     if (!Array.isArray(j.entities) || !j.entities.length) { err('entities[] is required and must not be empty.'); return { errors, warnings, stats: null }; }
     if (!Array.isArray(j.edges)) j.edges = [];
     const UNIT_ARCH = { word: 'unit', concept: 'hub', grammar: 'context', situation: 'context', insight: 'note', culture: 'note', question: 'note' };
@@ -1579,6 +1634,8 @@ class Component extends DCLogic {
       if (!e.w) err('entity "' + e.i + '" has no w (display name) — the graph cannot render it');
       if (e.pr !== undefined && !['core', 'useful', 'detail', 'skip'].includes(e.pr)) err('entity "' + e.i + '": pr must be one of core|useful|detail|skip (got "' + e.pr + '")');
       const kind = e.kind || 'word';
+      // long-name warnings only for map/session surfaces (hubs + units); note/context capsules render in cards where long titles are fine
+      if (e.w && (kinds[kind] === 'hub' || kinds[kind] === 'unit') && e.w.length > (kinds[kind] === 'hub' ? 20 : 28)) warn((kinds[kind] === 'hub' ? 'hub' : 'unit') + ' "' + e.i + '" has a long display name (' + e.w.length + ' chars: "' + e.w + '") — it will overflow the GUI; target ≤ ' + (kinds[kind] === 'hub' ? 16 : 24));
       if (!declaredKinds.has(kind)) err('entity "' + e.i + '" has undeclared kind "' + kind + '"');
       if (e.ex && e.bl && !e.ex.includes(e.bl)) err('entity "' + e.i + '": bl "' + e.bl + '" is not a substring of ex');
       const arch = kinds[kind];
@@ -1668,6 +1725,7 @@ class Component extends DCLogic {
     L.push('- Confusions: for every pair beginners mix up, add a confused_with edge with an "x" note explaining the difference.');
     L.push('- Insights: 3-8 question-led capsules (kind "insight") wired to their units via "explains" edges.');
     L.push('- Priority: assign pr EXPLICITLY on every unit — "core" (the backbone a learner cannot skip), "useful" (scheduled, the default), "detail" (real but optional depth — kept in the graph, not scheduled), "skip" (exists for completeness, excluded from the study path). Be deliberate: a pack where everything is core has no priorities.');
+    L.push('- Display names are GUI-constrained: _meta.title ≤ 24 chars; subtitle ≤ 40; hub w 1–2 words ≤ 16 chars (rendered as wide-spaced capitals on a map); unit w ≤ 24 chars, shorter is better (joined into session titles like "A · B · C"); path titles ≤ 24. Names are labels — the full meaning belongs in en/why, never in the name.');
     L.push('- ' + (compact ? 'SIZE: compact — 3-5 hubs, 25-40 units total.' : 'SIZE: full — 6-9 hubs, 55-90 units total.'));
     L.push('');
     L.push('== SELF-CHECK BEFORE ANSWERING (the app validates all of this mechanically) ==');
@@ -1788,6 +1846,194 @@ class Component extends DCLogic {
       if (active) this.loadGraph(this.manifest.find(m => !m.custom) || this.manifest[0]);
     });
   }
+  // ---- Rename flow: names-only surgery. Display names never carry identity — ids are untouched,
+  // so progress needs zero remapping. Export just the names, the AI proposes GUI-fitting ones,
+  // paste back, diff, apply. Same propose → deterministic validate → human applies division.
+  NAME_LIMITS = { title: 24, subtitle: 40, hub: 16, unit: 24, path: 24 };
+  buildRenamePrompt(intent) {
+    const j = this.activeGraphJson(); if (!j) return '';
+    const NL = this.NAME_LIMITS;
+    const isLangPack = (j.entities || []).some(e => this.isLangUnit(e));
+    const L = [this.PROMPT_COVER, ''];
+    L.push('You are a naming editor for a learning app. Below is the complete name inventory of one knowledge pack. Propose better DISPLAY NAMES that fit the app\'s GUI. You are renaming labels only — never ids, never meanings, never content.');
+    if (intent) { L.push('', '== MY INTENT ==', intent); }
+    L.push('');
+    L.push('== CONSTRAINTS ==');
+    L.push('- Pack title: at most ' + NL.title + ' characters. Subtitle: at most ' + NL.subtitle + '.');
+    L.push('- Cluster names: 1–2 words, at most ' + NL.hub + ' characters (they render in wide-spaced capitals on a map).');
+    L.push('- Topic names: at most ' + NL.unit + ' characters, shorter is better (they are joined into session titles like "A · B · C").');
+    L.push('- Route titles: at most ' + NL.path + ' characters.');
+    L.push('- Never change what a name MEANS. Shorten phrasing, drop filler words and parenthetical commentary — the full meaning already lives elsewhere in the pack.');
+    if (isLangPack) L.push('- This is a LANGUAGE pack: for vocabulary items the word itself IS the content. Leave the foreign words exactly as they are; only trim names that carry extra commentary around the word.');
+    L.push('- Include ONLY entries you actually want to change. An empty renames object means "all names are already good".');
+    L.push('');
+    L.push('== CURRENT NAMES ==');
+    L.push('Pack title: "' + ((j._meta && j._meta.title) || '') + '"');
+    L.push('Subtitle: "' + ((j._meta && j._meta.subtitle) || '') + '"');
+    const hubs = (j.entities || []).filter(e => this.isHub(e));
+    const units = (j.entities || []).filter(e => !this.isHub(e));
+    L.push('Clusters:');
+    hubs.forEach(e => L.push('  ' + e.i + ': "' + (e.w || '') + '"'));
+    L.push('Topics:');
+    units.forEach(e => L.push('  ' + e.i + ': "' + (e.w || '') + '"' + (this.isLangUnit(e) ? '   [vocabulary word — keep]' : '')));
+    if ((j.paths || []).length) {
+      L.push('Routes:');
+      j.paths.forEach(p => L.push('  ' + p.id + ': "' + (p.title || '') + '"'));
+    }
+    L.push('');
+    L.push('== DELIVERABLE SCOPE ==');
+    L.push('Your ENTIRE response is ONE fenced json code block, nothing else:');
+    L.push('{ "title": "…", "subtitle": "…", "renames": { "<entity id>": "New name" }, "paths": { "<route id>": "New title" } }');
+    L.push('Omit "title"/"subtitle" if unchanged; include only changed entries in "renames"/"paths". No commentary, no parts.');
+    L.push('');
+    L.push('Begin immediately. Do not ask what I want — produce the JSON now.');
+    return L.join('\n');
+  }
+  validateRename(json) {
+    const errors = [], warnings = [];
+    const j = this.activeGraphJson();
+    if (!json || typeof json !== 'object' || Array.isArray(json)) return { errors: ['The paste is not a JSON object.'], warnings, changes: 0 };
+    if (!j) return { errors: ['No active pack.'], warnings, changes: 0 };
+    const NL = this.NAME_LIMITS;
+    const byId = {}; (j.entities || []).forEach(e => { byId[e.i] = e; });
+    const pathIds = new Set((j.paths || []).map(p => p.id));
+    let changes = 0;
+    if (json.title !== undefined) { if (typeof json.title !== 'string' || !json.title.trim()) errors.push('title must be a non-empty string'); else { changes++; if (json.title.length > NL.title + 6) warnings.push('title is still long (' + json.title.length + ' chars, target ≤ ' + NL.title + ')'); } }
+    if (json.subtitle !== undefined) { if (typeof json.subtitle !== 'string') errors.push('subtitle must be a string'); else changes++; }
+    const seen = {};
+    Object.entries(json.renames || {}).forEach(([id, w]) => {
+      if (!byId[id]) { warnings.push('renames: unknown id "' + id + '" — will be skipped'); return; }
+      if (typeof w !== 'string' || !w.trim()) { errors.push('renames["' + id + '"] must be a non-empty string'); return; }
+      changes++;
+      const lim = this.isHub(byId[id]) ? NL.hub : NL.unit;
+      if (w.length > lim + 8) warnings.push('"' + w + '" is still long (' + w.length + ' chars, target ≤ ' + lim + ')');
+      if (seen[w.toLowerCase()]) warnings.push('duplicate new name "' + w + '"');
+      seen[w.toLowerCase()] = 1;
+    });
+    Object.entries(json.paths || {}).forEach(([id, t]) => {
+      if (!pathIds.has(id)) { warnings.push('paths: unknown route id "' + id + '" — will be skipped'); return; }
+      if (typeof t !== 'string' || !t.trim()) { errors.push('paths["' + id + '"] must be a non-empty string'); return; }
+      changes++;
+    });
+    if (!changes) errors.push('No changes proposed — nothing to apply.');
+    return { errors, warnings, changes };
+  }
+  renameDiffRows(json) {
+    const j = this.activeGraphJson(); if (!j) return [];
+    const byId = {}; (j.entities || []).forEach(e => { byId[e.i] = e; });
+    const rows = [];
+    if (json.title !== undefined && json.title !== ((j._meta || {}).title || '')) rows.push({ t: 'pack: "' + ((j._meta || {}).title || '') + '" → "' + json.title + '"' });
+    if (json.subtitle !== undefined && json.subtitle !== ((j._meta || {}).subtitle || '')) rows.push({ t: 'subtitle: "' + ((j._meta || {}).subtitle || '') + '" → "' + json.subtitle + '"' });
+    Object.entries(json.renames || {}).forEach(([id, w]) => { const e = byId[id]; if (e && w !== e.w) rows.push({ t: (this.isHub(e) ? 'cluster' : 'topic') + ': "' + (e.w || id) + '" → "' + w + '"' }); });
+    const pById = {}; (j.paths || []).forEach(p => { pById[p.id] = p; });
+    Object.entries(json.paths || {}).forEach(([id, t]) => { const p = pById[id]; if (p && t !== p.title) rows.push({ t: 'route: "' + (p.title || id) + '" → "' + t + '"' }); });
+    return rows;
+  }
+  // Plan sessions store derived display strings (titles, learn lines, todo texts). After a rename
+  // those go stale — refresh them from the live graph with the SAME formulas the planner uses
+  // (makeTeachSession / sessionArc / makeExamSession), preserving done flags and ids untouched.
+  refreshPlanNames() {
+    const p = this.state.plan; if (!p) return;
+    const G = this.G;
+    const nm = (id) => { const n = G.byId[id]; return n ? this.unitName(n) : id; };
+    const sessions = p.sessions.map(s => {
+      if (!s.units || !s.units.length) return s;
+      const names = s.units.map(nm);
+      const todo = (s.todo || []).map(t => {
+        if (!t.unitId || !G.byId[t.unitId]) return t;
+        const n = G.byId[t.unitId];
+        let text = t.text;
+        if (s.kind === 'exam' && t.act === 'review') text = 'Defend: ' + this.unitName(n) + ' — mechanism, not vibes';
+        else if (t.act === 'review') text = 'Review: ' + this.unitName(n) + ' — explain it cold, then check yourself';
+        else if (t.act === 'learn') text = 'Learn: ' + this.unitName(n) + (n.en ? ' — ' + n.en : '');
+        else if (t.act === 'predict') text = 'Predict: before you meet it — what do you think ' + this.unitName(n) + ' is for? One sentence.';
+        else if (t.act === 'implement') {
+          const langs = s.units.filter(id => this.isLangUnit(G.byId[id] || {}));
+          const isBlock = s.kind === 'capstone';
+          text = (langs.length === s.units.length)
+            ? (isBlock ? 'Production block: a short written dialogue using ' : 'Produce: 3 of your own sentences using ') + names.join(', ')
+            : (isBlock ? 'Implementation block: build a small working example combining ' : 'Mini implementation: sketch from memory, in code or on paper — ') + names.join(' + ');
+        }
+        return { ...t, text };
+      });
+      if (s.kind === 'exam') {
+        const hub = s.hubId && G.byId[s.hubId];
+        return { ...s, todo, title: hub ? 'Exam — ' + hub.w : s.title,
+                 payoff: hub ? 'You can defend everything in ' + hub.w + ' under questioning, with mechanisms and numbers.' : s.payoff,
+                 doneWhen: hub ? 'You answered the examiner’s challenges on ' + hub.w + ' without hand-waving — remaining gaps are named in your notes, not hidden.' : s.doneWhen };
+      }
+      if (s.kind !== 'teach' && s.kind !== 'capstone') return { ...s, todo };
+      const allLang = s.units.every(id => this.isLangUnit(G.byId[id] || {}));
+      const learn = [];
+      s.units.forEach(id => { const n = G.byId[id]; if (!n) return; if (n.en) learn.push(this.unitName(n) + ' — ' + n.en); if (n.mk) learn.push('Watch out: ' + n.mk); });
+      return { ...s, todo, title: names.join(' · '),
+               payoff: allLang
+                 ? 'You can use ' + names.join(', ') + ' in real conversation without reaching for a translator.'
+                 : 'You can explain ' + names.join(', ') + ' from first principles and rebuild ' + names[0] + ' from memory.',
+               learn: learn.slice(0, 6),
+               doneWhen: 'You taught it back without notes and the evidence block shows demonstrated for ' + (names.length > 1 ? 'all ' + names.length + ' topics' : names[0]) + '.' };
+    });
+    this.setState({ plan: { ...p, sessions } }, () => this.save());
+  }
+  applyRename(json) {
+    const entry = this.graphEntry;
+    if (!entry || !entry.custom) { this.showToast('Renames apply to custom packs only'); return; }
+    const packKey = this.KEYBASE + ':pack:' + entry.id;
+    const oldPack = (() => { try { return localStorage.getItem(packKey); } catch (e) { return null; } })();
+    if (!oldPack) { this.showToast('Pack data missing'); return; }
+    let packStr;
+    try {
+      const j = JSON.parse(oldPack);
+      j._meta = j._meta || {};
+      if (json.title !== undefined) j._meta.title = json.title;
+      if (json.subtitle !== undefined) j._meta.subtitle = json.subtitle;
+      const byId = {}; (j.entities || []).forEach(e => { byId[e.i] = e; });
+      Object.entries(json.renames || {}).forEach(([id, w]) => { if (byId[id] && typeof w === 'string' && w.trim()) byId[id].w = w.trim(); });
+      const pById = {}; (j.paths || []).forEach(p2 => { pById[p2.id] = p2; });
+      Object.entries(json.paths || {}).forEach(([id, t]) => { if (pById[id] && typeof t === 'string' && t.trim()) pById[id].title = t.trim(); });
+      packStr = JSON.stringify(j);
+    } catch (e) { this.showToast('Rename not applied — could not update the pack. Nothing changed.'); return; }
+    try { localStorage.setItem(packKey, packStr); }
+    catch (e) { try { localStorage.setItem(packKey, oldPack); } catch (e2) {} this.showToast('Could not store the renamed pack — nothing changed'); return; }
+    this.mergeCustom();
+    this.setState({ rename: null }, () => {
+      this.showToast('Names updated');
+      this.loadGraph(this.manifest.find(g => g.id === entry.id));
+      // loadGraph rebuilds G async; refresh the plan's derived strings once it lands
+      setTimeout(() => this.refreshPlanNames(), 600);
+    });
+  }
+  rnOpen = () => this.setState({ rename: { step: 1, intent: '', paste: '', result: null }, domainOpen: false });
+  rnClose = () => this.setState({ rename: null });
+  rnPatch(patch) { this.setState({ rename: { ...this.state.rename, ...patch } }); }
+  rnCopyPrompt = () => {
+    const rn = this.state.rename;
+    const text = this.buildRenamePrompt((rn.intent || '').trim());
+    if (!text) { this.showToast('No active pack'); return; }
+    const done = (ok) => { this.showToast(ok ? 'Naming prompt copied — paste it into your AI' : 'Copy failed'); if (ok) this.rnPatch({ step: 2 }); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true)).catch(() => this.copyFallback(text, done));
+    else this.copyFallback(text, done);
+  };
+  rnValidate = () => {
+    const rn = this.state.rename;
+    const json = this.extractJson(rn.paste);
+    if (!json) { this.rnPatch({ result: { errors: ['No JSON found in the paste — include the whole fenced block.'], warnings: [], json: null, changes: 0 } }); return; }
+    const v = this.validateRename(json);
+    this.rnPatch({ result: { ...v, json: v.errors.length ? null : json } });
+  };
+  rnApply = () => {
+    const rn = this.state.rename;
+    if (!rn.result || !rn.result.json) return;
+    this.applyRename(rn.result.json);
+  };
+  rnCopyFix = () => {
+    const rn = this.state.rename;
+    const errs = (rn.result && rn.result.errors) || [];
+    const text = [this.PROMPT_COVER, '', 'The rename JSON you produced failed validation. Fix ALL of these and return the corrected COMPLETE JSON as ONE fenced json block, nothing else:', '', ...errs.map(e2 => '- ' + e2)].join('\n');
+    const done = (ok) => this.showToast(ok ? 'Fix prompt copied' : 'Copy failed');
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true)).catch(() => this.copyFallback(text, done));
+    else this.copyFallback(text, done);
+  };
   // ---- Merge & Expand / Graph Surgery: LLM-driven graph construction with total accounting ----
   // Invariant (mechanical, enforced below): never lose source knowledge silently — every source
   // topic must survive, be deliberately consolidated, or be explicitly rejected with a reason.
@@ -1838,6 +2084,7 @@ class Component extends DCLogic {
       L.push('- If units are renamed, split, or merged, record absorbed ids in "al" and the operations in _merge.consolidated; removals require _merge.rejected entries with reasons.');
     }
     L.push('- Re-derive the hub set and hub "ord" (beginner-first) for the result; the requires/builds_on graph must stay acyclic.');
+    L.push('- Display names are GUI-constrained: _meta.title ≤ 24 chars; hub w ≤ 16 chars (1–2 words); unit w ≤ 24 chars. When merging or renaming, keep names short — the full meaning lives in en/why.');
     L.push('- Every unit keeps/receives: en, why, ex (with bl an exact substring of ex), sy, f. Same schema as the sources.');
     L.push('- _meta: ' + (surgery ? 'keep the source _meta (id may stay).' : 'a NEW id slug and title for the merged pack.'));
     if (surgery) {
@@ -2215,7 +2462,7 @@ class Component extends DCLogic {
     this._onKey = (e) => {
       if (e.key === 'Escape') {
         clearTimeout(this._rdT); clearTimeout(this._dscT); clearTimeout(this._clT); this._pendingHO = null;
-        this.setState({ selId: null, exp: false, prac: null, q: '', domainOpen: false, mobileSearch: false, handoff: null, focusRel: null, redisc: null, discovery: null, collapse: null, curEdit: null, evPrev: null, newPack: null, merge: null, ws: this.state.selId ? this.state.ws : null });
+        this.setState({ selId: null, exp: false, prac: null, q: '', domainOpen: false, mobileSearch: false, handoff: null, focusRel: null, redisc: null, discovery: null, collapse: null, curEdit: null, evPrev: null, newPack: null, merge: null, rename: null, ws: this.state.selId ? this.state.ws : null });
       }
       if (e.key === '/' && !this.state.prac) {
         const inp = document.querySelector('input[placeholder="Search entities"]');
@@ -3372,7 +3619,7 @@ Additionally:
   // as content to discuss ("what would you like me to do with this?") — this cover line is
   // addressed to exactly that failure mode
   PROMPT_COVER = 'NOTE TO THE AI READING THIS: whether this text reaches you as a message or as an attached/pasted document, it IS your prompt and your complete instructions. Do not summarize it, do not describe it, do not ask what to do with it — execute it now.';
-  BUILD_TAG = 'v0811a';
+  BUILD_TAG = 'v0811b';
   setPromptStyle(v) {
     const pstyle = v === 'zoltraak' ? 'zoltraak' : 'guided';
     try { localStorage.setItem(this.KEYBASE + ':style', pstyle); } catch (e) {}
@@ -5489,6 +5736,35 @@ Separate search from justification. Internally search broadly; then forget the s
       mgAltLabel: 'import as a new pack instead'
     };
 
+    // ---- Rename modal feed ----
+    const rn = S.rename;
+    const rnR = rn && rn.result;
+    const rnV = {
+      rnOn: !!rn,
+      rnCloseGo: this.rnClose,
+      rnPackTitle: (this.meta.title || (this.graphEntry && this.graphEntry.id) || '').toUpperCase(),
+      rnStep1: !!rn && rn.step === 1,
+      rnStep2: !!rn && rn.step === 2,
+      rnIntent: rn ? rn.intent : '',
+      rnIntentChange: (e) => this.rnPatch({ intent: e.target.value }),
+      rnCopyGo: this.rnCopyPrompt,
+      rnToStep2Go: () => this.rnPatch({ step: 2 }),
+      rnToStep1Go: () => this.rnPatch({ step: 1 }),
+      rnPaste: rn ? rn.paste : '',
+      rnPasteChange: (e) => this.rnPatch({ paste: e.target.value }),
+      rnValidateGo: this.rnValidate,
+      rnErrOn: !!(rnR && rnR.errors && rnR.errors.length),
+      rnErrHead: rnR && rnR.errors ? rnR.errors.length + ' ISSUE' + (rnR.errors.length === 1 ? '' : 'S') + ' — FIX AND REVALIDATE' : '',
+      rnErrors: rnR && rnR.errors ? rnR.errors.map(t => ({ t })) : [],
+      rnFixGo: this.rnCopyFix,
+      rnOkOn: !!(rnR && rnR.json),
+      rnHeadline: rnR && rnR.json ? rnR.changes + ' name' + (rnR.changes === 1 ? '' : 's') + ' will change — ids and progress untouched' : '',
+      rnWarnOn: !!(rnR && rnR.warnings && rnR.warnings.length),
+      rnWarnings: rnR && rnR.warnings ? rnR.warnings.map(t => ({ t })) : [],
+      rnDiffRows: rnR && rnR.json ? this.renameDiffRows(rnR.json).slice(0, 20) : [],
+      rnApplyGo: this.rnApply
+    };
+
     // ---- Learn mode: routes panel + guided-route HUD ----
     const routesOn = S.view === 'galaxy' && S.mode === 'learn' && !S.route && !S.selId && !S.exp && !S.prac && !S.redisc && !S.discovery && !S.ws && S.ready;
     // ---- Cluster Workspace panel: where the cluster becomes usable (study · AI tools · surgery)
@@ -5659,6 +5935,7 @@ Separate search from justification. Internally search broadly; then forget the s
         if (this.manifest.length > 1) rows.push({ label: '⧉ MERGE & EXPAND PACKS…', sub: 'your AI unifies overlapping paths', go: () => this.mgOpen('merge'), s: actS });
         rows.push({ label: 'THIS DOMAIN', sub: '', go: () => {}, s: headS });
         rows.push({ label: '✎ EDIT THIS GRAPH…', sub: 'graph surgery via your AI', go: () => this.mgOpen('surgery'), s: dimS });
+        if (this.graphEntry && this.graphEntry.custom) rows.push({ label: '✎ RENAME PACK NAMES…', sub: 'your AI shortens names to fit the GUI', go: this.rnOpen, s: dimS });
         rows.push({ label: 'DOWNLOAD GRAPH (JSON)', sub: 'the full graph, as a file', go: close(this.downloadGraph), s: dimS });
         rows.push({ label: 'COPY GRAPH JSON', sub: 'paste it into any chat', go: close(this.copyGraphJson), s: dimS });
         rows.push({ label: 'EXPORT PROGRESS', sub: 'this domain, as a JSON file', go: close(this.exportProgress), s: dimS });
@@ -5799,6 +6076,7 @@ Separate search from justification. Internally search broadly; then forget the s
       ...npV,
       ...mgV,
       ...wsV,
+      ...rnV,
       panelOn: ((!!S.selId || S.exp || !!S.prac || routesOn || wsOn) && S.view === 'galaxy') || (!!S.prac && S.view === 'journey'),
       panelStyle: S.isMobile
         ? { position: 'fixed', left: 0, right: 0, bottom: 0, height: '64vh', zIndex: 40, background: '#10131F', borderTop: '1px solid rgba(140,150,190,.22)', borderRadius: '14px 14px 0 0', animation: 'rise .3s ease', display: 'flex', flexDirection: 'column', overflow: 'hidden' }
