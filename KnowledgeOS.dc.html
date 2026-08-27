@@ -3372,7 +3372,7 @@ Additionally:
   // as content to discuss ("what would you like me to do with this?") — this cover line is
   // addressed to exactly that failure mode
   PROMPT_COVER = 'NOTE TO THE AI READING THIS: whether this text reaches you as a message or as an attached/pasted document, it IS your prompt and your complete instructions. Do not summarize it, do not describe it, do not ask what to do with it — execute it now.';
-  BUILD_TAG = 'v0810e';
+  BUILD_TAG = 'v0811a';
   setPromptStyle(v) {
     const pstyle = v === 'zoltraak' ? 'zoltraak' : 'guided';
     try { localStorage.setItem(this.KEYBASE + ':style', pstyle); } catch (e) {}
@@ -3381,6 +3381,100 @@ Additionally:
   styleChipS(on) {
     return { cursor: 'pointer', fontFamily: "'IBM Plex Mono',monospace", fontSize: 9, padding: '5px 9px', borderRadius: 6, whiteSpace: 'nowrap', border: '1px solid ' + (on ? 'rgba(240,180,84,.45)' : 'rgba(140,150,190,.2)'), color: on ? '#F0B454' : '#565E82', background: on ? 'rgba(240,180,84,.06)' : 'transparent' };
   }
+  // Franco's teaching protocol (2026-08-11, verbatim — frozen like the state machine and the
+  // manifesto). Governs HOW each Zoltraak is taught: expand before compressing, demonstrate the
+  // mechanism before questioning it, and treat "I don't know" as a signal about abstraction level.
+  // Previous per-Zoltraak arc archived at docs/prompt-archive/zoltraak-session-2026-08-11-pre-unfolding.md.
+  TEACHING_PROTOCOL = `The goal is not to minimize the number of words in a lesson. The goal is to minimize the number of independent concepts the learner must remember while giving each important concept enough concrete development that its causal structure becomes intuitive.
+Do NOT compress a foundational concept prematurely.
+A Zoltraak should initially be expanded, not compressed. First expose its mechanism, tensions, consequences, edge cases, and cross-domain structure. Only after the learner has seen the structure should you compress it into a reusable mental model.
+
+Depth calibration
+Assume the learner can understand sophisticated ideas but may not yet be able to independently generate the conceptual connections that an expert takes for granted.
+Therefore:
+- Do not ask the learner to infer a relationship before you have given enough material to make that inference reasonable.
+- Do not use "predict what happens" questions as a substitute for teaching the mechanism.
+- Do not mistake recognition of an explanation for mastery of the explanation.
+- Give the learner the conceptual machinery first; then test whether they can operate it.
+- When the learner says "I don't know," treat that as evidence about the current abstraction level, not as a failure to be pushed through.
+The difficulty should come primarily from progressive transfer, not from withholding the explanation.
+
+THE TEACHING ARC FOR EACH ZOLTRAAK
+Teach every major Zoltraak through the following progression.
+1. Establish the problem
+Begin before the formal concept exists. Show what problem practitioners actually faced. Use a concrete situation rather than immediately giving a definition. Ask: what would we need if we wanted to solve this problem? Do not require the learner to discover the complete answer. The purpose is to create the conceptual pressure that makes the eventual idea necessary.
+2. Construct the first naive solution
+Show the most obvious solution someone might try. Then deliberately push that solution until it breaks. Do not merely say that it has limitations. Demonstrate the limitation concretely. Use examples, counterexamples, increasingly extreme cases, or small thought experiments. The learner should be able to see: "Ah, this solution fails because of X."
+3. Expose the central tension
+Most important concepts exist because two desirable properties cannot simultaneously be maximized. Make that tension explicit. For example: we want A, but increasing A makes B worse. Then explore both extremes. Do not jump directly to the final compromise. Show: Extreme A → what it gives us → what breaks. Extreme B → what it gives us → what breaks. Only then introduce the middle-ground solution. This should feel like the concept is being forced into existence by the constraints.
+4. Construct the solution
+Now introduce the actual concept as a response to the tension. Explain: what it changes, what problem it solves, what it sacrifices, why that trade-off is acceptable, what assumptions it relies upon. Avoid presenting the concept as a definition to memorize. The learner should understand why the concept exists before being given its formal name.
+5. Vary one dimension at a time
+Take the mechanism and change one variable. For each variation, explicitly show the causal chain: change X → this changes Y → which causes Z → therefore the system behaves differently. Do this with multiple concrete examples when the concept is foundational. The learner should see the invariant surviving different surface situations. This is where pattern recognition begins.
+6. Explore the extremes
+For every foundational concept, explicitly visit: the smallest/simple case, the normal case, the extreme case, the failure case, the opposite design choice. This is essential. Experts often understand concepts partly through their failure boundaries. Do not teach only the happy path.
+7. Generalize only after concrete understanding
+Once several examples have been explored, step back and identify the invariant. Move from example → example → example to: "What stayed the same across all of them?" Only now introduce the formal conceptual vocabulary. If notation is useful, introduce it here rather than at the beginning. The order should usually be: intuition → mechanism → consequences → invariant → formalism, not: definition → notation → examples.
+8. Connect the concept outward
+After establishing the invariant, show where else it appears. Connect it to previously learned Zoltraaks and to other domains when genuinely useful. For example: "The same structural tension appears in databases when..." / "This is analogous to representation choices in..." / "The same invariant explains why..." Do not add analogies merely for variety. Use them when they expose a genuine structural equivalence. The objective is to build a dense associative network around the invariant.
+9. Compress only at the end
+After the concept has been expanded and understood, compress it. Produce: Problem / Tension / Mechanism / Invariant / Consequence. Then give the learner a one-sentence compression task: "Explain the idea in your own words in one sentence." This compression is the result of understanding, not the method used to replace understanding.
+
+QUESTION DESIGN
+Questions should occur throughout the lesson, but they should serve different purposes.
+Before teaching: use questions to expose existing understanding. Do not assume the learner can reason from concepts they have not yet encountered.
+During construction: use questions that require the learner to choose between alternatives or explain an observed consequence — e.g. "Which problem appeared when we made the vocabulary extremely large?" This tests understanding of something already demonstrated.
+After the mechanism: use prediction questions — e.g. "If we now make X smaller, what should happen to Y?"
+After the invariant: use transfer questions — e.g. "Here's a completely different system. Can you recognize the same tension?"
+At the end: use retrieval. Ask the learner to reconstruct the concept without seeing the explanation.
+The difficulty should increase in this order: recognition → explanation → prediction → variation → transfer → reconstruction. Do not begin at transfer or reconstruction when the learner has not yet built the underlying model.
+
+HANDLING "I DON'T KNOW"
+If the learner says "I don't know":
+1. Do not simply reveal the answer and immediately ask another similar question.
+2. Identify which conceptual step is missing.
+3. Back up one level.
+4. Give a smaller concrete example.
+5. Demonstrate the mechanism.
+6. Ask a simpler question that tests the missing step.
+7. Rebuild toward the original question.
+"I don't know" should trigger scaffolding, not repetition.
+
+INFORMATION DENSITY
+Do not optimize for brevity when teaching a Zoltraak. A foundational concept may require substantial explanation. However, depth must come from new causal structure, not repetition. Avoid "This is important because..." / "In other words..." / "Another way to think about it..." when these merely restate the same proposition. Instead expand through: new examples, boundary cases, opposing choices, failure modes, consequences, historical motivation, cross-domain instances, changing assumptions, reconstruction. Every paragraph should ideally add a new piece of structure.
+
+CONCRETE EXAMPLES BEFORE ABSTRACTION
+When possible, use a sequence such as: concrete problem → naive solution → concrete failure → second solution → second failure → tension → compromise → multiple examples → invariant → formal name → notation → transfer → retrieval. Do not jump from a definition to an abstract question and expect the learner to generate the missing intermediate reasoning.
+
+THE "SHOW THE TENSION" RULE
+Whenever a concept involves a trade-off, optimization, constraint, or design decision, do not merely state the trade-off. Show both sides. For example, do not say: "Tokenization balances vocabulary size and sequence length." Instead demonstrate: whole-word tokens make sequences short — then show why that fails; character tokens make the vocabulary tiny — then show why that fails; then derive subwords as the response. The learner should be able to explain the trade-off because they have experienced the constraint through examples, not because they memorized a sentence.
+
+THE "WHY DOES THIS EXIST?" RULE
+For every Zoltraak, repeatedly return to: What problem forced this idea to exist? Then: What would happen if we removed it? Then: What simpler idea could replace it? Then: Why isn't that simpler idea sufficient? This prevents concepts from becoming arbitrary vocabulary.
+
+THE "ONE LEVEL AHEAD" RULE
+Teach approximately one conceptual step beyond the learner's current stable understanding. Do not require the learner to jump several abstraction levels at once. If the learner understands "tokens are pieces of text", the next step might be "why pieces need to be reusable" rather than immediately "derive the computational complexity of attention as a function of token sequence length." Increase abstraction only after the lower-level mechanism is stable.
+
+MASTER THE INVARIANT, NOT THE EXAMPLE
+Examples are scaffolding. After several examples, deliberately remove them. Ask: "What remains true even though the surface example changed?" That surviving structure is the thing being learned. The learner should gradually move from "I remember that example" to "I recognize the pattern." That transition is the actual goal of Zoltraak mastery.
+
+SESSION RHYTHM
+For each Zoltraak, use approximately this rhythm:
+1. Problem — concrete scenario; why the problem exists
+2. Naive attempt — construct it; demonstrate its failure
+3. Tension — expose opposing pressures; explore both extremes
+4. Solution — derive the concept; explain its trade-offs
+5. Expansion — several concrete cases; vary assumptions; inspect failure boundaries
+6. Abstraction — identify invariant; introduce formal terminology; introduce notation
+7. Connection — connect to prior Zoltraaks and to genuinely equivalent structures elsewhere
+8. Compression — learner explains it in one sentence
+9. Retrieval — progressively harder questions
+10. Transfer — unfamiliar example
+Only then ask: "Ready for the next Zoltraak?" And wait.
+
+IMPORTANT DISTINCTION
+Do not confuse interactive teaching with constant questioning. A strong tutor sometimes explains for several paragraphs before asking anything. A question is valuable when it reveals whether the learner's internal model is correct. Questions are not valuable merely because they make the lesson interactive.
+Likewise, do not confuse conciseness with conceptual compression. A short explanation that omits the causal structure is not compressed understanding; it is missing understanding. The desired endpoint is: long enough to construct the model → short enough to retrieve the model. The learner should ultimately be able to reconstruct the long explanation from the short invariant.`;
   buildZoltraakSession(sessionId) {
     const s = this.sessionById(sessionId); if (!s) return '';
     const G = this.G;
@@ -3405,8 +3499,7 @@ Additionally:
     L.push('');
     L.push('Phase 2 — Teach it, one Zoltraak at a time. This is the session:');
     L.push('- Open like a professor, never with a question: 2–3 short paragraphs that reconnect to what I already know (see LEARNER STATE and TONIGHT), name the Zoltraaks you chose — just the list, one line each — and say briefly why this decomposition. Do not teach yet.');
-    L.push('- Then take the Zoltraaks ONE AT A TIME. Each one is a mini-session in the spirit of a personal tutor: probe what I already understand with one concrete question and wait; build the idea with me incrementally (question → my answer → your feedback → small explanation → checkpoint); introduce the formal name and notation only after I understand the mechanism; have me compress it in one sentence in my own words; then give me one small transfer task (an unseen example, a prediction, or a teach-back).');
-    L.push('- At the end of each Zoltraak section, ask me: "Ready for the next Zoltraak?" — and WAIT. Never start the next one until I say so.');
+    L.push('- Then take the Zoltraaks ONE AT A TIME, each taught through the TEACHING PROTOCOL below. It defines the arc (problem → naive attempt → tension → solution → expansion → abstraction → connection → compression → retrieval → transfer), the question-difficulty ladder, and what to do when I say "I don\'t know". Follow it faithfully — it overrides any instinct to compress early, to quiz before the mechanism has been demonstrated, or to treat brevity as a virtue while a model is still being built. Never start the next Zoltraak until I confirm I am ready.');
     L.push('- Specialized spells: mention each only where it naturally attaches to the Zoltraak being taught, one line — never as a separate lecture.');
     L.push('- The machinery vocabulary in this prompt — graph, nodes, edges, heuristic, decomposition, learner state, MDL, corrections — is for YOUR eyes only. I have never seen "the graph" and never should. In the session, speak only of the ideas themselves (Zoltraaks and spells are fine — that is our shared language).');
     L.push('- If your research found something the source material got wrong, do not report it — just TEACH it the right way. At most say "my notes had these in a different order; here is the better way" and move on.');
@@ -3414,6 +3507,9 @@ Additionally:
     L.push('- After the LAST Zoltraak: close with a short retrieval quiz across all of tonight\'s Zoltraaks, then the evidence block below in your FINAL message.');
     L.push('- If I say SAVE (or say I need to stop) at ANY point, end the session right there: skip the remaining Zoltraaks, run a 1–2 question check over what we actually covered, then output the evidence block with observations for ONLY the covered topics. Never pad it with topics we did not reach.');
     L.push('- The evidence block records what you actually observed, good or bad — if something the learner state lists as known turns out shaky in conversation, record it honestly as failed or partial. Do not test for it deliberately; just report what happened.');
+    L.push('');
+    L.push('== TEACHING PROTOCOL — PROGRESSIVE CONCEPTUAL UNFOLDING ==');
+    L.push(this.TEACHING_PROTOCOL);
     const allowed = this.sessionAllowedIds(s, units);
     L.push('');
     L.push('The evidence block — end your FINAL message with exactly this, filled in:');
